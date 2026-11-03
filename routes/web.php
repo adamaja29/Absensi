@@ -43,12 +43,12 @@ Route::middleware(['role:waka'])->group(function () {
     Route::get('/waka/dashboard', function () {
         return view('waka.dashboard');})->name('waka.dashboard');
 
-    // Route::get('/waka/tahun-ajaran/data', [wakaController::class, 'dataTahunAjaran'])->name('waka.tahun-ajaran.data');
-    // Route::get('/waka/tahun-ajaran/tambah', [wakaController::class, 'createTahunAjaran'])->name('waka.tahun-ajaran.create');
-    // Route::post('/waka/tahun-ajaran', [wakaController::class, 'storeTahunAjaran'])->name('waka.tahun-ajaran.store');
-    // Route::get('/waka/tahun-ajaran/{tahunAjaran}/edit', [wakaController::class, 'editTahunAjaran'])->name('waka.tahun-ajaran.edit');
-    // Route::put('/waka/tahun-ajaran/{tahunAjaran}', [wakaController::class, 'updateTahunAjaran'])->name('waka.tahun-ajaran.update');
-    // Route::delete('/waka/tahun-ajaran/{tahunAjaran}', [wakaController::class, 'destroyTahunAjaran'])->name('waka.tahun-ajaran.destroy');
+    Route::get('/waka/tahun-ajaran/data', [wakaController::class, 'dataTahunAjaran'])->name('waka.tahun-ajaran.data');
+    Route::get('/waka/tahun-ajaran/tambah', [wakaController::class, 'createTahunAjaran'])->name('waka.tahun-ajaran.create');
+    Route::post('/waka/tahun-ajaran', [wakaController::class, 'storeTahunAjaran'])->name('waka.tahun-ajaran.store');
+    Route::get('/waka/tahun-ajaran/{tahunAjaran}/edit', [wakaController::class, 'editTahunAjaran'])->name('waka.tahun-ajaran.edit');
+    Route::put('/waka/tahun-ajaran/{tahunAjaran}', [wakaController::class, 'updateTahunAjaran'])->name('waka.tahun-ajaran.update');
+    Route::delete('/waka/tahun-ajaran/{tahunAjaran}', [wakaController::class, 'destroyTahunAjaran'])->name('waka.tahun-ajaran.destroy');
 });
 
 
