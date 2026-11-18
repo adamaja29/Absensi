@@ -1,0 +1,114 @@
+/* ========================================================
+   ADMIN & WAKA DASHBOARD CUSTOM STYLES
+   ======================================================== */
+
+:root {
+    --adm-primary: #066fd1;
+    --adm-primary-hover: #055cb0;
+    --adm-card-border: #e6e8eb;
+    --adm-bg: #f8fafc;
+}
+
+body {
+    background-color: var(--adm-bg);
+}
+
+.admin-page {
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+}
+
+.admin-page-header {
+    margin-bottom: 1.5rem;
+}
+
+/* CARDS */
+.admin-content-card,
+.card {
+    border: 1px solid var(--adm-card-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-stat-card {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.admin-stat-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+.admin-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* BADGES & TABLES */
+.table th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    background-color: #f8fafc;
+    font-weight: 600;
+}
+
+.table-vcenter td {
+    vertical-align: middle;
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--adm-card-border);
+    padding: 1rem 1.25rem;
+}
+
+.card-title {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* ACTION BUTTONS */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: var(--adm-primary);
+    border-color: var(--adm-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--adm-primary-hover);
+    border-color: var(--adm-primary-hover);
+}
+
+/* QUICK LINK WIDGETS */
+.quick-link-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid var(--adm-card-border);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+
+.quick-link-card:hover {
+    color: var(--adm-primary);
+    border-color: var(--adm-primary);
+    box-shadow: 0 4px 12px rgba(6, 111, 209, 0.1);
+    transform: translateY(-2px);
+}

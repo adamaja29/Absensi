@@ -44,20 +44,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($guru as $index => $guru)
+                        @forelse ($guru as $index => $guruItem)
                             <tr>
-                                <td>{{ method_exists($guru, 'firstItem') && $guru->firstItem() ? $guru->firstItem() + $index : $index + 1 }}</td>
-                                <td>{{ $guru->user->name ?? '-' }}</td>
-                                <td>{{ $guru->nip ?? '-' }}</td>
-                                <td>{{ $guru->user->email ?? '-' }}</td>
-                                <td>{{ $guru->no_hp ?? '-' }}</td>
+                                <td>{{ $guru->firstItem() ? $guru->firstItem() + $index : $index + 1 }}</td>
+                                <td>{{ $guruItem->user->name ?? '-' }}</td>
+                                <td>{{ $guruItem->nip ?? '-' }}</td>
+                                <td>{{ $guruItem->user->email ?? '-' }}</td>
+                                <td>{{ $guruItem->no_hp ?? '-' }}</td>
                                 <td>
                                     <div class="btn-list flex-nowrap">
-                                        <a href="{{ route('admin.guru.edit', $guru) }}" class="btn btn-sm btn-outline-primary">
+                                        <a href="{{ route('admin.guru.edit', $guruItem) }}" class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-pencil-square me-1"></i>
                                             Edit
                                         </a>
-                                        <form action="{{ route('admin.guru.destroy', $guru) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data guru ini?')">
+                                        <form action="{{ route('admin.guru.destroy', $guruItem) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data guru ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -78,8 +78,8 @@
             </div>
 
             <!-- Pagination Links -->
-            @if (method_exists($guru, 'links'))
-                <div class="d-flex justify-content-end mt-3">
+            @if ($guru->hasPages())
+                <div class="d-flex justify-content-center justify-content-md-end mt-3">
                     {{ $guru->links() }}
                 </div>
             @endif

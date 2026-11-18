@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    @yield('styles')
+    @stack('styles')
 </head>
 
 <body>
@@ -25,5 +27,7 @@
 </div>
 
 <script src="{{ asset('tabler/js/tabler.min.js') }}"></script>
+@yield('scripts')
+@stack('scripts')
 </body>
 </html>

@@ -42,18 +42,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($waka as $index => $waka)
+                        @forelse ($waka as $index => $wakaItem)
                             <tr>
-                                <td>{{ method_exists($waka, 'firstItem') && $waka->firstItem() ? $waka->firstItem() + $index : $index + 1 }}</td>
-                                <td>{{ $waka->name }}</td>
-                                <td>{{ $waka->email }}</td>
+                                <td>{{ $waka->firstItem() ? $waka->firstItem() + $index : $index + 1 }}</td>
+                                <td>{{ $wakaItem->name }}</td>
+                                <td>{{ $wakaItem->email }}</td>
                                 <td>
                                     <div class="btn-list flex-nowrap">
-                                        <a href="{{ route('admin.waka.edit', $waka) }}" class="btn btn-sm btn-outline-primary">
+                                        <a href="{{ route('admin.waka.edit', $wakaItem) }}" class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-pencil-square me-1"></i>
                                             Edit
                                         </a>
-                                        <form action="{{ route('admin.waka.destroy', $waka) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data waka ini?')">
+                                        <form action="{{ route('admin.waka.destroy', $wakaItem) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data waka ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -74,8 +74,8 @@
             </div>
 
             <!-- Pagination Links -->
-            @if (method_exists($waka, 'links'))
-                <div class="d-flex justify-content-end mt-3">
+            @if ($waka->hasPages())
+                <div class="d-flex justify-content-center justify-content-md-end mt-3">
                     {{ $waka->links() }}
                 </div>
             @endif

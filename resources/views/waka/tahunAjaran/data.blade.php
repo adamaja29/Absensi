@@ -81,7 +81,7 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-end mt-3">
+            <div class="mt-3">
                 {{ $tahunAjaran->links() }}
             </div>
         </div>

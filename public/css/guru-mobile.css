@@ -1,0 +1,219 @@
+/* ========================================================
+   GURU MOBILE WEB APP STYLES
+   Optimized for Smartphone Screens & Thumb Interaction
+   ======================================================== */
+
+:root {
+    --mobile-primary: #1e40af;
+    --mobile-primary-light: #eff6ff;
+    --mobile-accent: #0ea5e9;
+    --mobile-bg: #f8fafc;
+    --mobile-card: #ffffff;
+    --mobile-text: #0f172a;
+    --mobile-muted: #64748b;
+    --mobile-border: #e2e8f0;
+    --mobile-success: #10b981;
+    --mobile-warning: #f59e0b;
+    --mobile-danger: #ef4444;
+}
+
+body {
+    background-color: #0f172a; /* Dark background on desktop to highlight phone container */
+    color: var(--mobile-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* PHONE WRAPPER: Full width on mobile, sleek phone frame on desktop */
+.mobile-app-container {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background-color: var(--mobile-bg);
+    position: relative;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+}
+
+/* TOP APP BAR */
+.mobile-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: #ffffff;
+    padding: 16px 20px 20px 20px;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2);
+}
+
+.mobile-header .user-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+/* MAIN CONTENT */
+.mobile-content {
+    flex: 1;
+    padding: 16px;
+    padding-bottom: 90px; /* Space for sticky bottom nav */
+}
+
+/* BOTTOM NAVIGATION BAR */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    height: 68px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--mobile-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 1040;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.nav-item-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--mobile-muted);
+    font-size: 0.72rem;
+    font-weight: 500;
+    flex: 1;
+    padding: 6px 0;
+    transition: all 0.2s ease;
+}
+
+.nav-item-mobile i {
+    font-size: 1.35rem;
+    margin-bottom: 3px;
+    transition: transform 0.2s ease;
+}
+
+.nav-item-mobile.active {
+    color: var(--mobile-primary);
+    font-weight: 700;
+}
+
+.nav-item-mobile.active i {
+    transform: translateY(-2px);
+    color: #2563eb;
+}
+
+/* CARDS IN MOBILE */
+.card-mobile {
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-mobile:active {
+    transform: scale(0.99);
+}
+
+/* TOUCH-FRIENDLY BUTTONS */
+.btn-mobile-primary {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.btn-mobile-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.btn-mobile-outline {
+    background: transparent;
+    color: var(--mobile-primary);
+    border: 1.5px solid var(--mobile-primary);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+}
+
+/* LIVE PULSE ANIMATION FOR ACTIVE LESSON */
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.pulse-badge {
+    animation: pulseGlow 2s infinite;
+}
+
+/* BOTTOM SHEET MODAL ON MOBILE */
+@media (max-width: 576px) {
+    .modal-dialog-bottom {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+        max-width: 100%;
+    }
+    .modal-dialog-bottom .modal-content {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-left-radius: 24px;
+        border-top-right-radius: 24px;
+        border: none;
+        box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15);
+    }
+}
