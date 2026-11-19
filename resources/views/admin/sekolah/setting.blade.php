@@ -6,14 +6,13 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <style>
     #map, #modal-map {
-        height: 420px;
         width: 100%;
-        border-radius: 12px;
+        border-radius: var(--radius-control);
         z-index: 1;
     }
     .leaflet-popup-content {
         font-family: inherit;
-        font-size: 13px;
+        font-size: var(--text-sm);
     }
 </style>
 @endsection
@@ -27,7 +26,7 @@
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
                 <h3 class="card-title">Pengaturan Titik GPS & Radius Sekolah</h3>
-                <div class="text-secondary mt-1" style="font-size: 0.875rem;">
+                <div class="text-secondary mt-1" style="font-size: var(--text-sm);">
                     Pilih titik pusat sekolah di peta interaktif Leaflet dan atur radius toleransi absensi guru.
                 </div>
             </div>
@@ -81,7 +80,7 @@
 
                     <!-- PETA LEAFLET INTERAKTIF -->
                     <div class="col-12 mt-4" id="map-section">
-                        <div class="card border border-primary-subtle shadow-sm">
+                        <div class="card border border-primary-subtle">
                             <div class="card-header bg-primary-lt d-flex justify-content-between align-items-center flex-wrap gap-2 py-2 px-3">
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="avatar avatar-sm bg-primary text-white rounded">
@@ -114,7 +113,7 @@
 
                             <div class="card-body p-2">
                                 <!-- MAP CONTAINER -->
-                                <div id="map" style="height: 420px; width: 100%; border-radius: 8px;"></div>
+                                <div id="map" style="height: 420px; width: 100%; border-radius: var(--radius-control);"></div>
                                 <div class="d-flex justify-content-between align-items-center mt-2 px-2">
                                     <span id="loc-status" class="text-secondary small">Status: Peta siap digunakan. Geser pin merah untuk mengganti koordinat.</span>
                                     <span class="badge bg-primary-lt font-monospace" id="coord-display">
@@ -199,7 +198,7 @@
                         <i class="bi bi-crosshair me-1"></i> GPS Saya
                     </button>
                 </div>
-                <div id="modal-map" style="height: 480px; width: 100%; border-radius: 8px;"></div>
+                <div id="modal-map" style="height: 480px; width: 100%; border-radius: var(--radius-control);"></div>
             </div>
             <div class="modal-footer d-flex justify-content-between">
                 <span class="small font-monospace text-secondary" id="modal-coord-text">
@@ -226,6 +225,10 @@ function scrollKePeta() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    const rootStyle = getComputedStyle(document.documentElement);
+    const mapLineColor = rootStyle.getPropertyValue('--color-map-line').trim();
+    const mapFillColor = rootStyle.getPropertyValue('--color-map-fill').trim();
+
     let initialLat = parseFloat(document.getElementById('latitude').value) || -6.200000;
     let initialLng = parseFloat(document.getElementById('longitude').value) || 106.816666;
     let initialRadius = parseInt(document.getElementById('radius_meter').value) || 100;
@@ -246,9 +249,9 @@ document.addEventListener("DOMContentLoaded", function () {
     marker.bindPopup("<b>Lokasi Sekolah</b><br>Geser pin untuk mengubah koordinat.").openPopup();
 
     const radiusCircle = L.circle([initialLat, initialLng], {
-        color: '#2563eb',
-        fillColor: '#3b82f6',
-        fillOpacity: 0.2,
+        color: mapLineColor,
+        fillColor: mapFillColor,
+        fillOpacity: 1,
         radius: initialRadius
     }).addTo(map);
 
@@ -363,9 +366,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             modalMarker = L.marker([curLat, curLng], { draggable: true }).addTo(modalMap);
             modalRadiusCircle = L.circle([curLat, curLng], {
-                color: '#2563eb',
-                fillColor: '#3b82f6',
-                fillOpacity: 0.2,
+                color: mapLineColor,
+                fillColor: mapFillColor,
+                fillOpacity: 1,
                 radius: curRadius
             }).addTo(modalMap);
 

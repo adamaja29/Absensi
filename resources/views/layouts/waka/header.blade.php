@@ -8,10 +8,14 @@
                     </span>
                     <div class="d-none d-xl-block ps-2">
                         <div class="fw-bold">{{ Auth::user()->name ?? 'Pengguna' }}</div>
-                        <div class="mt-1 small text-secondary text-uppercase">{{ Auth::user()->role ?? 'Waka' }}</div>
+                        <div class="mt-1 small text-secondary">Waka Kurikulum</div>
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <a href="{{ route('waka.profile') }}" class="dropdown-item">
+                        <i class="bi bi-person-gear me-2 text-primary"></i>Profil Saya
+                    </a>
+                    <div class="dropdown-divider"></div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-item text-danger">

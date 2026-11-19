@@ -37,7 +37,7 @@
                             <option value="">-- Pilih Tahun Ajaran --</option>
                             @foreach($daftarTahunAjaran as $tahun)
                                 <option value="{{ $tahun->id }}" {{ old('tahun_ajaran_id', $tahunAktif?->id) == $tahun->id ? 'selected' : '' }}>
-                                    {{ $tahun->nama }} · Semester {{ ucfirst($tahun->semester) }}{{ $tahun->status ? ' · Aktif' : '' }}
+                                    {{ $tahun->nama }}, Semester {{ ucfirst($tahun->semester) }}{{ $tahun->status ? ' (Aktif)' : '' }}
                                 </option>
                             @endforeach
                         </select>
@@ -48,7 +48,7 @@
                             <option value="">-- Pilih Kelas --</option>
                             @foreach($daftarKelas as $kelas)
                                 <option value="{{ $kelas->id }}" {{ old('kelas_id') == $kelas->id ? 'selected' : '' }}>
-                                    {{ $kelas->nama_kelas }}{{ $kelas->tingkat || $kelas->jurusan ? ' · '.$kelas->tingkat.' '.$kelas->jurusan : '' }}
+                                    {{ $kelas->nama_kelas }}{{ $kelas->tingkat || $kelas->jurusan ? ', '.$kelas->tingkat.' '.$kelas->jurusan : '' }}
                                 </option>
                             @endforeach
                         </select>
@@ -104,7 +104,7 @@
                             <option value="">-- Pilih Mata Pelajaran --</option>
                             @foreach($daftarMapel as $mapel)
                                 <option value="{{ $mapel->id }}" {{ old('mata_pelajaran_id') == $mapel->id ? 'selected' : '' }}>
-                                    {{ $mapel->nama }}{{ $mapel->kode ? ' · '.$mapel->kode : '' }}
+                                    {{ $mapel->nama }}{{ $mapel->kode ? ' ('.$mapel->kode.')' : '' }}
                                 </option>
                             @endforeach
                         </select>
@@ -115,7 +115,7 @@
                             <option value="">-- Pilih Guru --</option>
                             @foreach($daftarGuru as $guru)
                                 <option value="{{ $guru->id }}" {{ old('guru_id') == $guru->id ? 'selected' : '' }}>
-                                    {{ $guru->user->name ?? 'Guru #'.$guru->id }}{{ $guru->nip ? ' · NIP '.$guru->nip : '' }}
+                                    {{ $guru->user->name ?? 'Guru #'.$guru->id }}{{ $guru->nip ? ' (NIP '.$guru->nip.')' : '' }}
                                 </option>
                             @endforeach
                         </select>
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const breakCell = row.insertCell();
                 breakCell.colSpan = days.length + 1;
                 breakCell.className = 'bg-warning-lt text-warning-emphasis fw-semibold py-2';
-                breakCell.textContent = `☕ ${slot.nama} · ${slot.mulai}–${slot.selesai}`;
+                breakCell.textContent = `${slot.nama}, ${slot.mulai}–${slot.selesai}`;
                 return;
             }
 
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     button.dataset.pickSlot = slot.id;
                     const input = form.querySelector(`input[name="jam_pelajaran_ids[]"][value="${slot.id}"]`);
                     const selected = daySelect.value === day && input?.checked;
-                    button.className = `btn btn-sm ${selected ? 'btn-success' : 'btn-outline-success'} py-1`;
+                    button.className = `btn btn-sm ${selected ? 'btn-primary' : 'btn-outline-primary'} py-1`;
                     button.textContent = selected ? 'Terpilih' : 'Pilih sesi';
                     cell.appendChild(button);
                 } else {

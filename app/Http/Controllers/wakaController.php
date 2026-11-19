@@ -13,19 +13,31 @@ use App\Models\MataPelajaran;
 use App\Models\SekolahSetting;
 use App\Models\tahunAjaran;
 use App\Models\User;
+use App\Support\AbsenceBlockResolver;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class wakaController extends Controller
 {
+    private function attachMeetingAttendance(Collection $schedules, string $date): Collection
+    {
+        $attendance = AbsensiGuru::whereIn('jadwal_pelajaran_id', $schedules->pluck('id'))
+            ->whereDate('tanggal', $date)
+            ->get();
+
+        return AbsenceBlockResolver::attachAttendance($schedules, $attendance);
+    }
+
     /** Validate selected teaching sessions and return their range in the legacy schema. */
     private function resolveJadwalSessionRange(array $validated, Request $request): array
     {
@@ -177,29 +189,22 @@ class wakaController extends Controller
         if ($tahunAktif) {
             $jadwalHariIniQuery->where('tahun_ajaran_id', $tahunAktif->id);
         }
-        $totalJadwalHariIni = $jadwalHariIniQuery->count();
-
-        $jadwalIds = (clone $jadwalHariIniQuery)->pluck('id');
-        $absensiHariIni = AbsensiGuru::whereIn('jadwal_pelajaran_id', $jadwalIds)
-            ->whereDate('tanggal', $today)
-            ->get();
-
-        $sudahHadir = $absensiHariIni->whereIn('status', ['hadir', 'terlambat'])->count();
-        $terlambat = $absensiHariIni->where('status', 'terlambat')->count();
-        $izinSakit = $absensiHariIni->whereIn('status', ['izin', 'sakit'])->count();
-        $belumCheckIn = max(0, $totalJadwalHariIni - $absensiHariIni->count());
-
         $izinMenunggu = IzinGuru::where('status', 'menunggu')->count();
         $settingSekolah = SekolahSetting::getSetting();
 
         $jadwalHariIni = (clone $jadwalHariIniQuery)
-            ->with(['guru.user', 'kelas', 'mataPelajaran', 'jamMulai', 'jamSelesai', 'absensi' => function ($q) use ($today) {
-                $q->whereDate('tanggal', $today);
-            }])
+            ->with(['guru.user', 'kelas', 'mataPelajaran', 'jamMulai', 'jamSelesai'])
             ->orderBy(JamPelajaran::select('jam_mulai')
                 ->whereColumn('jam_pelajaran.id', 'jadwal_pelajaran.jam_pelajaran_mulai_id'))
-            ->take(6)
             ->get();
+        $this->attachMeetingAttendance($jadwalHariIni, $today);
+
+        $totalJadwalHariIni = $jadwalHariIni->count();
+        $sudahHadir = $jadwalHariIni->filter(fn ($jadwal) => in_array($jadwal->absensi->first()?->status, ['hadir', 'terlambat'], true))->count();
+        $terlambat = $jadwalHariIni->filter(fn ($jadwal) => $jadwal->absensi->first()?->status === 'terlambat')->count();
+        $izinSakit = $jadwalHariIni->filter(fn ($jadwal) => in_array($jadwal->absensi->first()?->status, ['izin', 'sakit'], true))->count();
+        $belumCheckIn = $jadwalHariIni->filter(fn ($jadwal) => !$jadwal->absensi->first())->count();
+        $jadwalHariIni = $jadwalHariIni->take(6);
 
         return view('waka.dashboard', compact(
             'totalGuru',
@@ -1333,8 +1338,26 @@ class wakaController extends Controller
             ->orderBy(JamPelajaran::select('jam_mulai')
                 ->whereColumn('jam_pelajaran.id', 'jadwal_pelajaran.jam_pelajaran_mulai_id'))
             ->get();
+        $this->attachMeetingAttendance($semuaJadwalHari, $tanggal);
 
-        // Hitung statistik
+        // Filter status (OR): Waka dapat memilih satu atau beberapa status sekaligus.
+        $statusValid = ['hadir', 'terlambat', 'izin_sakit', 'belum'];
+        $statusFilter = array_values(array_intersect(
+            (array) $request->input('status', []),
+            $statusValid
+        ));
+        if ($statusFilter) {
+            $semuaJadwalHari = $semuaJadwalHari->filter(function ($item) use ($statusFilter) {
+                $absen = $item->absensi->first();
+                $statusItem = !$absen
+                    ? 'belum'
+                    : (in_array($absen->status, ['izin', 'sakit'], true) ? 'izin_sakit' : $absen->status);
+
+                return in_array($statusItem, $statusFilter, true);
+            })->values();
+        }
+
+        // Hitung statistik dari data yang sudah difilter
         $totalJadwal = $semuaJadwalHari->count();
         $sudahCheckIn = 0;
         $terlambatCount = 0;
@@ -1355,23 +1378,6 @@ class wakaController extends Controller
             } else {
                 $belumCheckInCount++;
             }
-        }
-
-        // Filter status (OR): Waka dapat memilih satu atau beberapa status sekaligus.
-        $statusValid = ['hadir', 'terlambat', 'izin_sakit', 'belum'];
-        $statusFilter = array_values(array_intersect(
-            (array) $request->input('status', []),
-            $statusValid
-        ));
-        if ($statusFilter) {
-            $semuaJadwalHari = $semuaJadwalHari->filter(function ($item) use ($statusFilter) {
-                $absen = $item->absensi->first();
-                $statusItem = !$absen
-                    ? 'belum'
-                    : (in_array($absen->status, ['izin', 'sakit'], true) ? 'izin_sakit' : $absen->status);
-
-                return in_array($statusItem, $statusFilter, true);
-            });
         }
 
         $daftarGuru = guru::with('user')->get();
@@ -1460,8 +1466,37 @@ class wakaController extends Controller
             ->orderBy(JamPelajaran::select('jam_mulai')
                 ->whereColumn('jam_pelajaran.id', 'jadwal_pelajaran.jam_pelajaran_mulai_id'))
             ->get();
+        $this->attachMeetingAttendance($semuaJadwalHari, $tanggal);
 
-        // Hitung statistik
+        // Filter status jika dipilih
+        $statusValid = ['hadir', 'terlambat', 'izin_sakit', 'belum'];
+        $rawStatus = $request->input('status', []);
+        $statusFilter = array_values(array_intersect(
+            (array) $rawStatus,
+            $statusValid
+        ));
+
+        $filterStatusNama = 'Semua Status';
+        if (!empty($statusFilter)) {
+            $statusLabels = [
+                'hadir' => 'Hadir (Tepat Waktu)',
+                'terlambat' => 'Terlambat',
+                'izin_sakit' => 'Izin / Sakit',
+                'belum' => 'Belum Check-In'
+            ];
+            $filterStatusNama = implode(', ', array_map(fn ($s) => $statusLabels[$s] ?? $s, $statusFilter));
+
+            $semuaJadwalHari = $semuaJadwalHari->filter(function ($item) use ($statusFilter) {
+                $absen = $item->absensi->first();
+                $statusItem = !$absen
+                    ? 'belum'
+                    : (in_array($absen->status, ['izin', 'sakit'], true) ? 'izin_sakit' : $absen->status);
+
+                return in_array($statusItem, $statusFilter, true);
+            })->values();
+        }
+
+        // Hitung statistik dari data yang sudah difilter
         $totalJadwal = $semuaJadwalHari->count();
         $sudahCheckIn = 0;
         $terlambatCount = 0;
@@ -1484,26 +1519,14 @@ class wakaController extends Controller
             }
         }
 
-        // Filter status jika dipilih
-        if ($statusFilter = $request->input('status')) {
-            $semuaJadwalHari = $semuaJadwalHari->filter(function ($item) use ($statusFilter) {
-                $absen = $item->absensi->first();
-                if ($statusFilter === 'hadir') {
-                    return $absen && $absen->status === 'hadir';
-                }
-                if ($statusFilter === 'terlambat') {
-                    return $absen && $absen->status === 'terlambat';
-                }
-                if ($statusFilter === 'izin_sakit') {
-                    return $absen && in_array($absen->status, ['izin', 'sakit']);
-                }
-                if ($statusFilter === 'belum') {
-                    return !$absen;
-                }
-                return true;
-            });
-        }
+        $isFiltered = $request->filled('guru_id') ||
+                      $request->filled('kelas_id') ||
+                      $request->filled('mata_pelajaran_id') ||
+                      !empty($statusFilter);
 
+        $daftarGuru = guru::with('user')->get();
+        $daftarKelas = Kelas::orderBy('nama_kelas')->get();
+        $daftarMapel = MataPelajaran::orderBy('nama')->get();
         $wakaUser = Auth::user();
 
         return view('waka.absensi.cetak', compact(
@@ -1520,6 +1543,12 @@ class wakaController extends Controller
             'filterGuruNama',
             'filterKelasNama',
             'filterMapelNama',
+            'filterStatusNama',
+            'statusFilter',
+            'isFiltered',
+            'daftarGuru',
+            'daftarKelas',
+            'daftarMapel',
             'wakaUser'
         ));
     }
@@ -1536,6 +1565,11 @@ class wakaController extends Controller
             ->withQueryString();
 
         return view('waka.izin.data', compact('izin'));
+    }
+
+    public function buktiIzin(IzinGuru $izin): Response
+    {
+        return $this->serveBuktiIzin($izin);
     }
 
     public function updateStatusIzin(Request $request, IzinGuru $izin): RedirectResponse
@@ -1595,5 +1629,50 @@ class wakaController extends Controller
 
         return redirect()->route('waka.izin.data')
             ->with('success', 'Status pengajuan izin/sakit berhasil diperbarui.');
+    }
+
+    // ==========================================
+    // PROFIL PENGGUNA (WAKA)
+    // ==========================================
+    public function profile(): View
+    {
+        $user = Auth::user();
+        return view('waka.profile', compact('user'));
+    }
+
+    public function updateProfile(Request $request): RedirectResponse
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
+            'current_password' => ['nullable', 'required_with:password', 'current_password'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ], [
+            'current_password.current_password' => 'Password saat ini tidak sesuai.',
+            'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+            'password.min' => 'Password baru minimal 8 karakter.',
+        ]);
+
+        $userData = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ];
+
+        if (!empty($validated['password'])) {
+            $userData['password'] = $validated['password'];
+        }
+
+        $user->update($userData);
+
+        return redirect()->route('waka.profile')
+            ->with('success', 'Profil Waka Kurikulum berhasil diperbarui.');
     }
 }

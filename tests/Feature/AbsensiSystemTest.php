@@ -116,6 +116,115 @@ class AbsensiSystemTest extends TestCase
         ]);
     }
 
+    public function test_one_checkin_covers_adjacent_sessions_and_waka_sees_all_as_attended()
+    {
+        $this->travelTo(Carbon::parse('2026-11-09 08:05:00', 'Asia/Jakarta'));
+        $data = $this->setupData();
+
+        $firstSession = JamPelajaran::findOrFail($data['jadwal']->jam_pelajaran_mulai_id);
+        $firstSession->update(['jam_mulai' => '07:00:00', 'jam_selesai' => '08:00:00']);
+        JamPelajaran::create([
+            'nama_sesi' => 'Istirahat Test',
+            'jenis' => 'istirahat',
+            'jam_mulai' => '08:00:00',
+            'jam_selesai' => '08:15:00',
+            'urutan' => 2,
+        ]);
+        $secondSession = JamPelajaran::create([
+            'nama_sesi' => 'Sesi Test 2',
+            'jenis' => 'pelajaran',
+            'jam_mulai' => '08:15:00',
+            'jam_selesai' => '09:00:00',
+            'urutan' => 3,
+        ]);
+        $thirdSession = JamPelajaran::create([
+            'nama_sesi' => 'Sesi Test 3',
+            'jenis' => 'pelajaran',
+            'jam_mulai' => '09:00:00',
+            'jam_selesai' => '10:00:00',
+            'urutan' => 4,
+        ]);
+        $jadwalSesiKedua = JadwalPelajaran::create([
+            'tahun_ajaran_id' => $data['jadwal']->tahun_ajaran_id,
+            'guru_id' => $data['guruProfile']->id,
+            'kelas_id' => $data['jadwal']->kelas_id,
+            'mata_pelajaran_id' => $data['jadwal']->mata_pelajaran_id,
+            'hari' => $data['jadwal']->hari,
+            'jam_pelajaran_mulai_id' => $secondSession->id,
+            'jam_pelajaran_selesai_id' => $secondSession->id,
+        ]);
+        $jadwalSesiKetiga = JadwalPelajaran::create([
+            'tahun_ajaran_id' => $data['jadwal']->tahun_ajaran_id,
+            'guru_id' => $data['guruProfile']->id,
+            'kelas_id' => $data['jadwal']->kelas_id,
+            'mata_pelajaran_id' => $data['jadwal']->mata_pelajaran_id,
+            'hari' => $data['jadwal']->hari,
+            'jam_pelajaran_mulai_id' => $thirdSession->id,
+            'jam_pelajaran_selesai_id' => $thirdSession->id,
+        ]);
+
+        $this->actingAs($data['guruUser'])
+            ->get('/guru/dashboard')
+            ->assertOk()
+            ->assertSee('Check-In Sekarang')
+            ->assertSee('07:00 - 10:00');
+
+        $this->actingAs($data['guruUser'])->post('/guru/absen', [
+            'jadwal_pelajaran_id' => $data['jadwal']->id,
+            'latitude' => -6.20000000,
+            'longitude' => 106.81666600,
+            'materi_diajarkan' => 'Materi sesi berurutan',
+        ])->assertSessionHas('success');
+
+        $this->travelTo(Carbon::parse('2026-11-09 08:30:00', 'Asia/Jakarta'));
+        $this->actingAs($data['guruUser'])->post('/guru/absen', [
+            'jadwal_pelajaran_id' => $jadwalSesiKedua->id,
+            'latitude' => -6.20000000,
+            'longitude' => 106.81666600,
+            'materi_diajarkan' => 'Tidak boleh membuat absen kedua',
+        ])->assertSessionHas('info');
+
+        $this->travelTo(Carbon::parse('2026-11-09 09:15:00', 'Asia/Jakarta'));
+        $this->actingAs($data['guruUser'])->post('/guru/absen', [
+            'jadwal_pelajaran_id' => $jadwalSesiKetiga->id,
+            'latitude' => -6.20000000,
+            'longitude' => 106.81666600,
+            'materi_diajarkan' => 'Tidak boleh membuat absen ketiga',
+        ])->assertSessionHas('info');
+
+        $this->assertDatabaseCount('absensi_guru', 1);
+
+        $monitoring = $this->actingAs($data['wakaUser'])->get(route('waka.absensi.monitoring', [
+            'tanggal' => '2026-11-09',
+        ]));
+        $monitoring->assertOk();
+
+        $jadwalHari = $monitoring->viewData('semuaJadwalHari');
+        $this->assertCount(3, $jadwalHari);
+        foreach ($jadwalHari as $jadwal) {
+            $this->assertNotNull($jadwal->absensi->first());
+            $this->assertSame('terlambat', $jadwal->absensi->first()->status);
+        }
+
+        $this->assertSame(3, $monitoring->viewData('sudahCheckIn'));
+        $this->assertSame(0, $monitoring->viewData('belumCheckInCount'));
+
+        $dashboard = $this->actingAs($data['wakaUser'])->get(route('waka.dashboard'));
+        $dashboard->assertOk()
+            ->assertViewHas('sudahHadir', 3)
+            ->assertViewHas('belumCheckIn', 0);
+
+        $cetak = $this->actingAs($data['wakaUser'])->get(route('waka.absensi.cetak', [
+            'tanggal' => '2026-11-09',
+        ]));
+        $cetak->assertOk();
+        $jadwalCetak = $cetak->viewData('semuaJadwalHari');
+        $this->assertCount(3, $jadwalCetak);
+        foreach ($jadwalCetak as $jadwal) {
+            $this->assertNotNull($jadwal->absensi->first());
+        }
+    }
+
     public function test_guru_cannot_checkin_outside_gps_radius()
     {
         $data = $this->setupData();
@@ -171,7 +280,7 @@ class AbsensiSystemTest extends TestCase
         ]);
     }
 
-    public function test_guru_weekly_agenda_is_sorted_by_time_across_activities_and_lessons()
+    public function test_guru_weekly_agenda_is_sorted_and_dashboard_prioritizes_active_schedule()
     {
         $this->travelTo(Carbon::parse('2026-11-09 08:15:00', 'Asia/Jakarta'));
         $data = $this->setupData();
@@ -234,12 +343,10 @@ class AbsensiSystemTest extends TestCase
         $dashboard = $this->actingAs($data['guruUser'])->get('/guru/dashboard');
         $dashboard->assertOk();
         $dashboardEarlyPosition = strpos($dashboard->getContent(), 'Pelajaran Lebih Awal');
-        $dashboardActivityPosition = strpos($dashboard->getContent(), 'Kegiatan Sebelum Jadwal');
-
         $this->assertNotFalse($dashboardEarlyPosition);
-        $this->assertNotFalse($dashboardActivityPosition);
-        $this->assertLessThan($dashboardActivityPosition, $dashboardEarlyPosition);
-        $dashboard->assertSee('Jam Mengajar Berlangsung');
+        $dashboard->assertDontSee('Matematika Test');
+        $dashboard->assertDontSee('Kegiatan Sebelum Jadwal');
+        $dashboard->assertSee('Sedang Berlangsung');
     }
 
     public function test_waka_can_access_monitoring()
@@ -266,7 +373,7 @@ class AbsensiSystemTest extends TestCase
 
         $response = $this->actingAs($data['wakaUser'])->get('/waka/absensi/cetak');
         $response->assertStatus(200);
-        $response->assertSee('LAPORAN REKAPITULASI PRESENSI');
+        $response->assertSee('REKAPITULASI PRESENSI');
     }
 
     public function test_login_page_renders_cleanly()

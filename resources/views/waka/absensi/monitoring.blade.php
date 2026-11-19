@@ -32,7 +32,7 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
-                            <span class="bg-primary text-white avatar">
+                            <span class="bg-primary-lt text-primary avatar">
                                 <i class="bi bi-calendar3 fs-2"></i>
                             </span>
                         </div>
@@ -50,7 +50,7 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
-                            <span class="bg-success text-white avatar">
+                            <span class="bg-success-lt text-success avatar">
                                 <i class="bi bi-check-circle fs-2"></i>
                             </span>
                         </div>
@@ -68,7 +68,7 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
-                            <span class="bg-warning text-white avatar">
+                            <span class="bg-warning-lt text-warning avatar">
                                 <i class="bi bi-clock-history fs-2"></i>
                             </span>
                         </div>
@@ -86,7 +86,7 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
-                            <span class="bg-secondary text-white avatar">
+                            <span class="bg-secondary-lt text-secondary avatar">
                                 <i class="bi bi-hourglass-split fs-2"></i>
                             </span>
                         </div>
@@ -161,11 +161,33 @@
 
     <!-- TABEL MONITORING JADWAL & ABSENSI -->
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title">Daftar Jadwal & Status Kehadiran</h3>
-            <a href="{{ route('waka.absensi.cetak', request()->all()) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
-                <i class="bi bi-printer me-1"></i> Cetak Laporan (PDF)
-            </a>
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h3 class="card-title m-0">Daftar Jadwal & Status Kehadiran</h3>
+                @php
+                    $isFiltered = request()->filled('guru_id') || request()->filled('kelas_id') || request()->filled('mata_pelajaran_id') || !empty(request('status'));
+                @endphp
+                @if($isFiltered)
+                    <span class="badge bg-primary-lt small mt-1">
+                        <i class="bi bi-funnel-fill me-1"></i>Filter Aktif ({{ $semuaJadwalHari->count() }} data)
+                    </span>
+                @else
+                    <span class="badge bg-secondary-lt small mt-1">
+                        <i class="bi bi-grid-3x3 me-1"></i>Menampilkan Semua Data ({{ $semuaJadwalHari->count() }} data)
+                    </span>
+                @endif
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                @if($isFiltered)
+                    <a href="{{ route('waka.absensi.cetak', request()->all()) }}" target="_blank" class="btn btn-sm btn-primary shadow-sm" title="Cetak data sesuai filter yang sedang aktif">
+                        <i class="bi bi-printer-fill me-1"></i> Cetak Laporan
+                    </a>
+                @endif
+                <!-- <a href="{{ route('waka.absensi.cetak', ['tanggal' => $tanggal]) }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Cetak seluruh data tanpa filter">
+                    <i class="bi bi-printer me-1"></i> Cetak Semua Data
+                </a> -->
+            </div>
         </div>
         <div class="table-responsive">
             <table class="table table-vcenter card-table table-hover">
@@ -243,12 +265,12 @@
                                 @if($absen)
                                     <button type="button" class="btn btn-sm btn-outline-primary"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#modalDetail{{ $absen->id }}">
+                                        data-bs-target="#modalDetail{{ $item->id }}">
                                         <i class="bi bi-eye me-1"></i>Detail
                                     </button>
 
                                     <!-- MODAL DETAIL ABSENSI -->
-                                    <div class="modal fade" id="modalDetail{{ $absen->id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal fade" id="modalDetail{{ $item->id }}" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
                                                 <div class="modal-header">
@@ -282,7 +304,7 @@
                                                             <div class="d-flex justify-content-between align-items-center mt-1">
                                                                 <span class="small font-monospace">{{ $absen->latitude ?? '-' }}, {{ $absen->longitude ?? '-' }}</span>
                                                                 @if($absen->latitude && $absen->longitude)
-                                                                    <a href="https://www.google.com/maps?q={{ $absen->latitude }},{{ $absen->longitude }}" target="_blank" class="btn btn-xs btn-outline-primary" style="font-size: 0.75rem; padding: 2px 8px;">
+                                                                    <a href="https://www.google.com/maps?q={{ $absen->latitude }},{{ $absen->longitude }}" target="_blank" class="btn btn-xs btn-outline-primary" style="font-size: var(--text-xs); padding: var(--space-3xs) var(--space-xs);">
                                                                         <i class="bi bi-geo-alt-fill me-1"></i> Buka Peta Lokasi
                                                                     </a>
                                                                 @endif

@@ -1,6 +1,6 @@
 # Claude Code ToolBox — MCP & Skills awareness
 
-_Generated: 2026-11-17T14:18:37.753Z_
+_Generated: 2026-11-18T23:32:11.637Z_
 
 ## How to use this report
 
@@ -33,7 +33,8 @@ _None found (or no workspace open)._
 
 ### User-scoped
 
-_None found._
+- **hallmark** — `C:\Users\adamaja\.claude\skills\hallmark`
+  - Design skill for websites and new pages that look designed, not generated. Use when the user asks to build or design something new, or names Hallmark. Never use it on an existing design unless the user names Hallmark, as
 
 ---
 

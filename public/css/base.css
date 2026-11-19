@@ -1,0 +1,140 @@
+/* Hallmark · base · checked: 2026-11-18 · genre: modern-minimal (inferred)
+ * built: the project · redesign: polish · v2.0.0 */
+
+html,
+body {
+    overflow-x: clip;
+}
+
+html {
+    scroll-padding-top: var(--space-xl);
+    scrollbar-color: var(--color-rule-2) transparent;
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--line-body);
+    color: var(--color-ink);
+    background-color: var(--color-paper);
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--color-ink);
+    line-height: var(--line-tight);
+    text-wrap: balance;
+    overflow-wrap: break-word;
+    min-width: 0;
+}
+
+p {
+    text-wrap: pretty;
+}
+
+a {
+    color: var(--color-accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+a:hover {
+    color: var(--color-accent-hover);
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+}
+
+::selection {
+    background-color: var(--color-accent-soft);
+    color: var(--color-ink);
+}
+
+img,
+svg {
+    max-width: 100%;
+}
+
+/* Bootstrap/Tabler utilities resolved through the token set */
+.text-white {
+    color: var(--color-accent-ink) !important;
+}
+
+.text-dark {
+    color: var(--color-ink) !important;
+}
+
+.bg-white {
+    background-color: var(--color-paper-2) !important;
+}
+
+.bg-light,
+.bg-body-tertiary {
+    background-color: var(--color-paper-3) !important;
+}
+
+.rounded-3 {
+    border-radius: var(--radius-card) !important;
+}
+
+.h1 {
+    font-size: var(--text-3xl);
+}
+
+.h2 {
+    font-size: var(--text-2xl);
+}
+
+.h3 {
+    font-size: var(--text-xl);
+}
+
+.h4 {
+    font-size: var(--text-lg);
+}
+
+.h5 {
+    font-size: var(--text-base);
+}
+
+.h6 {
+    font-size: var(--text-sm);
+}
+
+.fs-2 {
+    font-size: var(--text-3xl) !important;
+}
+
+.fs-3 {
+    font-size: var(--text-2xl) !important;
+}
+
+.fs-4 {
+    font-size: var(--text-xl) !important;
+}
+
+.fs-5 {
+    font-size: var(--text-lg) !important;
+}
+
+.fs-6 {
+    font-size: var(--text-base) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

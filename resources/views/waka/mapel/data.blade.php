@@ -6,7 +6,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <h3 class="card-title">Data Mata Pelajaran</h3>
-                <div class="text-secondary mt-1" style="font-size: 0.875rem;">Kelola daftar mata pelajaran yang diajarkan di sekolah.</div>
+                <div class="text-secondary mt-1" style="font-size: var(--text-sm);">Kelola daftar mata pelajaran yang diajarkan di sekolah.</div>
             </div>
             <a href="{{ route('waka.mapel.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i>

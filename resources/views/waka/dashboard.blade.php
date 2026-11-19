@@ -9,10 +9,12 @@
             <h2 class="page-title mb-1">Dashboard Waka Kurikulum</h2>
             <div class="text-secondary">
                 {{ $hariIni }}, {{ \Carbon\Carbon::parse($today)->translatedFormat('d F Y') }}
-                @if($tahunAktif)
-                    &bull; TA {{ $tahunAktif->nama }} &bull; Semester {{ ucfirst($tahunAktif->semester) }}
-                @endif
             </div>
+            @if($tahunAktif)
+                <div class="text-secondary small">
+                    Tahun ajaran {{ $tahunAktif->nama }}, semester {{ ucfirst($tahunAktif->semester) }}
+                </div>
+            @endif
         </div>
         <a href="{{ route('waka.absensi.monitoring') }}" class="btn btn-primary">
             <i class="bi bi-clipboard-check me-1"></i> Monitoring Absensi

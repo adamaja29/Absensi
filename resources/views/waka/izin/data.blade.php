@@ -6,7 +6,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <h3 class="card-title">Permohonan Izin & Sakit Guru</h3>
-                <div class="text-secondary mt-1" style="font-size: 0.875rem;">
+                <div class="text-secondary mt-1" style="font-size: var(--text-sm);">
                     Verifikasi dan setujui surat keterangan izin atau sakit dari guru yang berhalangan hadir.
                 </div>
             </div>
@@ -70,7 +70,7 @@
                                 <td style="max-width: 250px;">{{ $item->alasan }}</td>
                                 <td>
                                     @if($item->bukti_file)
-                                        <a href="{{ asset('storage/' . $item->bukti_file) }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                        <a href="{{ route('waka.izin.bukti', $item) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-paperclip me-1"></i>Lihat Bukti
                                         </a>
                                     @else

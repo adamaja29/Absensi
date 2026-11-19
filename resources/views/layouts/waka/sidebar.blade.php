@@ -27,9 +27,13 @@
                         </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                        <a href="{{ route('waka.profile') }}" class="dropdown-item w-100 text-start">
+                            <i class="bi bi-person-gear me-2 text-primary"></i>Profil Saya
+                        </a>
+                        <div class="dropdown-divider"></div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="dropdown-item" style="width: 100%; text-align: left;">Logout</button>
+                            <button type="submit" class="dropdown-item w-100 text-start text-danger">Logout</button>
                         </form>
                     </div>
                 </div>
@@ -110,6 +114,14 @@
                             @if(($izinMenungguNotification ?? 0) > 0)
                                 <span class="badge bg-danger ms-auto">{{ $izinMenungguNotification }}</span>
                             @endif
+                        </a>
+                    </li>
+                    <li class="nav-item m-2">
+                        <a class="nav-link {{ request()->routeIs('waka.profile') ? 'active' : '' }}" href="{{ route('waka.profile') }}">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <i class="bi bi-person-gear fs-4"></i>
+                            </span>
+                            <span class="nav-link-title"> Profil Saya </span>
                         </a>
                     </li>
                 </ul>

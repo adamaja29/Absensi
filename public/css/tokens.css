@@ -1,0 +1,104 @@
+/* Hallmark · tokens · checked: 2026-11-18 · genre: modern-minimal (inferred)
+ * posture: restrained · accent under 5% of the screen
+ * built: the project · redesign: polish · v2.0.0 */
+
+:root {
+    /* colour — one cool-neutral family, one blue signal */
+    --color-paper: oklch(97.6% 0.004 255);
+    --color-paper-2: oklch(99.3% 0.002 255);
+    --color-paper-3: oklch(95.4% 0.008 255);
+    --color-ink: oklch(26% 0.018 255);
+    --color-ink-2: oklch(38% 0.016 255);
+    --color-muted: oklch(50% 0.014 255);
+    --color-rule: oklch(90.5% 0.008 255);
+    --color-rule-2: oklch(84% 0.01 255);
+    --color-accent: oklch(51% 0.15 255);
+    --color-accent-hover: oklch(45% 0.15 255);
+    --color-accent-soft: oklch(94.5% 0.03 255);
+    --color-accent-ink: oklch(99% 0.002 255);
+    --color-accent-rgb: 11, 95, 189;
+    --color-focus: oklch(56% 0.19 255);
+    --color-error: oklch(50% 0.18 25);
+    --color-error-soft: oklch(95% 0.025 25);
+    --color-success: oklch(48% 0.12 155);
+    --color-success-soft: oklch(95% 0.035 155);
+    --color-warning: oklch(52% 0.12 75);
+    --color-warning-soft: oklch(95.5% 0.04 85);
+    --color-violet: oklch(48% 0.14 300);
+    --color-violet-soft: oklch(95% 0.03 300);
+    --color-nav-bg: oklch(24% 0.03 255);
+    --color-nav-bg-2: oklch(29% 0.03 255);
+    --color-nav-ink: oklch(96% 0.006 255);
+    --color-nav-muted: oklch(74% 0.015 255);
+    --color-overlay: oklch(24% 0.02 255 / 0.35);
+    --color-map-line: oklch(51% 0.15 255);
+    --color-map-fill: oklch(51% 0.15 255 / 0.2);
+
+    /* type — one family, fixed app scale */
+    --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-display: var(--font-body);
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --text-2xs: 11px;
+    --text-xs: 12px;
+    --text-sm: 13px;
+    --text-base: 16px;
+    --text-lg: 18px;
+    --text-xl: 20px;
+    --text-2xl: 24px;
+    --text-3xl: 28px;
+    --text-title: var(--text-lg);
+    --line-body: 1.55;
+    --line-tight: 1.25;
+
+    /* space */
+    --space-3xs: 2px;
+    --space-2xs: 4px;
+    --space-xs: 8px;
+    --space-sm: 12px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+    --space-4xl: 96px;
+    --container: 1320px;
+
+    /* shape */
+    --radius-card: 10px;
+    --radius-control: 8px;
+    --radius-pill: 999px;
+    --shadow-card: 0 1px 2px oklch(25% 0.02 255 / 0.05);
+    --shadow-pop: 0 8px 24px oklch(25% 0.02 255 / 0.12);
+
+    /* motion */
+    --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.65, 0.05, 0.36, 1);
+    --dur-micro: 120ms;
+    --dur-short: 180ms;
+    --dur-long: 320ms;
+
+    /* layers */
+    --z-base: 1;
+    --z-raised: 10;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-sticky-nav: 300;
+    --z-modal: 400;
+    --z-toast: 500;
+
+    /* Tabler roles mapped onto the tokens above */
+    --tblr-body-bg: var(--color-paper);
+    --tblr-body-color: var(--color-ink);
+    --tblr-secondary: var(--color-muted);
+    --tblr-muted: var(--color-muted);
+    --tblr-border-color: var(--color-rule);
+    --tblr-border-color-translucent: var(--color-rule);
+    --tblr-font-sans-serif: var(--font-body);
+    --tblr-font-monospace: var(--font-mono);
+    --tblr-primary: var(--color-accent);
+    --tblr-primary-rgb: var(--color-accent-rgb);
+    --tblr-border-radius: var(--radius-control);
+    --tblr-border-radius-lg: var(--radius-card);
+    --tblr-link-color: var(--color-accent);
+    --tblr-link-hover-color: var(--color-accent-hover);
+}

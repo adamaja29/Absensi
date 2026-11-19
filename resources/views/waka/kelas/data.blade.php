@@ -6,7 +6,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <h3 class="card-title">Data Kelas</h3>
-                <div class="text-secondary mt-1" style="font-size: 0.875rem;">Kelola data kelas dan rombongan belajar.</div>
+                <div class="text-secondary mt-1" style="font-size: var(--text-sm);">Kelola data kelas dan rombongan belajar.</div>
             </div>
             <a href="{{ route('waka.kelas.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i>

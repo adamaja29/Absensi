@@ -126,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveButton.disabled = true;
         show('info', 'Sedang memeriksa bentrok jadwal…');
         const data = new FormData(form);
+        data.delete('_method');
         data.append('jadwal_id', '{{ $jadwal->id }}');
         try {
             const response = await fetch('{{ route('waka.jadwal.check') }}', {

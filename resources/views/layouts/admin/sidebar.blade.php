@@ -29,7 +29,7 @@
                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="dropdown-item" style="width: 100%; text-align: left;">Logout</button>
+                            <button type="submit" class="dropdown-item w-100 text-start">Logout</button>
                         </form>
                     </div>
                 </div>

@@ -16,11 +16,11 @@
                         @endif
 
                         @if($selectedTahun?->is_published)
-                            <span class="badge bg-success text-white fs-5 px-3 py-1">
-                                <i class="bi bi-broadcast me-1"></i> Dipublikasikan ke Guru
+                            <span class="badge bg-success-lt fs-5 px-3 py-1">
+                                <i class="bi bi-broadcast me-1"></i> Dipublikasikan ke guru
                             </span>
                         @else
-                            <span class="badge bg-warning text-dark fs-5 px-3 py-1">
+                            <span class="badge bg-warning-lt fs-5 px-3 py-1">
                                 <i class="bi bi-file-earmark-lock me-1"></i> Mode Draft (Belum Dipublikasikan)
                             </span>
                         @endif
@@ -38,18 +38,18 @@
                             <input type="hidden" name="tahun_ajaran_id" value="{{ $selectedTahun->id }}">
                         @endif
                         @if($selectedTahun?->is_published)
-                            <button type="submit" class="btn btn-outline-warning" onclick="return confirm('Kembalikan status jadwal ke DRAFT? Guru tidak akan melihat jadwal hingga dipublikasikan kembali.')">
+                            <button type="submit" class="btn btn-outline-secondary" onclick="return confirm('Kembalikan status jadwal ke draft? Guru tidak akan melihat jadwal hingga dipublikasikan kembali.')">
                                 <i class="bi bi-eye-slash me-1"></i>Kembalikan ke Draft
                             </button>
                         @else
-                            <button type="submit" class="btn btn-success" onclick="return confirm('Publikasikan jadwal ini ke seluruh guru? Guru akan dapat melihat jadwal mengajar mereka di portal guru.')">
+                            <button type="submit" class="btn btn-outline-primary" onclick="return confirm('Publikasikan jadwal ini ke seluruh guru? Guru akan dapat melihat jadwal mengajar mereka di portal guru.')">
                                 <i class="bi bi-broadcast me-1"></i>Publikasikan Jadwal ke Guru
                             </button>
                         @endif
                     </form>
 
                     <!-- Tombol Tambah Kegiatan & KBM -->
-                    <a href="{{ route('waka.kegiatan.create', ['hari' => $selectedHari]) }}" class="btn btn-teal">
+                    <a href="{{ route('waka.kegiatan.create', ['hari' => $selectedHari]) }}" class="btn btn-outline-secondary">
                         <i class="bi bi-calendar-plus me-1"></i> Kegiatan Sekolah (Upacara/Istirahat)
                     </a>
                     <a href="{{ route('waka.jadwal.create') }}" class="btn btn-primary">
@@ -131,40 +131,36 @@
                     </div>
 
                     <!-- Timeline Content -->
-                    <div class="timeline-container position-relative ps-4" style="border-left: 2px solid var(--tblr-border-color); margin-left: 20px;">
+                    <div class="timeline-container position-relative ps-4" style="border-left: 2px solid var(--color-rule); margin-left: 20px;">
                         @forelse($timelineHariIni as $item)
                             @if($item['type'] === 'kegiatan')
                                 @php $keg = $item['data']; @endphp
                                 <!-- BLOK KEGIATAN SEKOLAH (Upacara / Istirahat / Senam / Ibadah) -->
                                 <div class="timeline-block mb-4 position-relative">
                                     <div class="position-absolute" style="left: -33px; top: 0;">
-                                        @if($keg->jenis === 'upacara')
-                                            <span class="avatar avatar-sm rounded-circle bg-danger text-white shadow-sm">🇮🇩</span>
-                                        @elseif($keg->jenis === 'istirahat')
-                                            <span class="avatar avatar-sm rounded-circle bg-warning text-white shadow-sm">☕</span>
-                                        @elseif($keg->jenis === 'ibadah')
-                                            <span class="avatar avatar-sm rounded-circle bg-teal text-white shadow-sm">🕌</span>
-                                        @elseif($keg->jenis === 'senam')
-                                            <span class="avatar avatar-sm rounded-circle bg-azure text-white shadow-sm">🏃</span>
-                                        @elseif($keg->jenis === 'literasi')
-                                            <span class="avatar avatar-sm rounded-circle bg-purple text-white shadow-sm">📖</span>
-                                        @else
-                                            <span class="avatar avatar-sm rounded-circle bg-secondary text-white shadow-sm">📌</span>
-                                        @endif
+                                        <span class="avatar avatar-sm rounded-circle bg-secondary-lt text-secondary">
+                                            @if($keg->jenis === 'upacara') <i class="bi bi-flag"></i>
+                                            @elseif($keg->jenis === 'istirahat') <i class="bi bi-cup-hot"></i>
+                                            @elseif($keg->jenis === 'ibadah') <i class="bi bi-moon-stars"></i>
+                                            @elseif($keg->jenis === 'senam') <i class="bi bi-activity"></i>
+                                            @elseif($keg->jenis === 'literasi') <i class="bi bi-book"></i>
+                                            @else <i class="bi bi-calendar-event"></i>
+                                            @endif
+                                        </span>
                                     </div>
 
-                                    <div class="card border-2 shadow-sm {{ $keg->jenis === 'upacara' ? 'border-danger-subtle bg-danger-lt' : ($keg->jenis === 'istirahat' ? 'border-warning-subtle bg-warning-lt' : 'border-teal-subtle bg-teal-lt') }}">
+                                    <div class="card {{ $keg->jenis === 'upacara' ? 'bg-danger-lt' : ($keg->jenis === 'istirahat' ? 'bg-warning-lt' : 'bg-teal-lt') }}">
                                         <div class="card-body p-3">
                                             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1">
                                                 <div class="d-flex align-items-center gap-2">
-                                                    <span class="badge bg-dark text-white font-monospace">
+                                                    <span class="badge bg-secondary-lt font-monospace">
                                                         <i class="bi bi-clock me-1"></i>{{ substr($keg->jam_mulai, 0, 5) }} - {{ substr($keg->jam_selesai, 0, 5) }} WIB
                                                     </span>
                                                     <h4 class="card-title m-0 fw-bold">{{ $keg->nama_kegiatan }}</h4>
                                                 </div>
                                                 <div class="d-flex align-items-center gap-2">
                                                     <span class="badge bg-secondary-lt fw-normal text-secondary">
-                                                        <i class="bi bi-shield-x me-1"></i>Kegiatan Sekolah &bull; Bukan KBM (Tanpa Absen)
+                                                        <i class="bi bi-shield-x me-1"></i>Kegiatan sekolah, bukan KBM (tanpa absen)
                                                     </span>
                                                     <div class="btn-list">
                                                         <a href="{{ route('waka.kegiatan.edit', $keg) }}" class="btn btn-sm btn-icon btn-outline-primary" title="Edit Kegiatan">
@@ -198,15 +194,15 @@
                                 @php $j = $item['data']; @endphp
                                 <div class="timeline-block mb-4 position-relative">
                                     <div class="position-absolute" style="left: -33px; top: 0;">
-                                        <span class="avatar avatar-sm rounded-circle bg-primary text-white shadow-sm">
+                                        <span class="avatar avatar-sm rounded-circle bg-primary-lt text-primary">
                                             <i class="bi bi-book"></i>
                                         </span>
                                     </div>
 
-                                    <div class="card shadow-sm border">
+                                    <div class="card border">
                                         <div class="card-header py-2 px-3 bg-body-tertiary d-flex justify-content-between align-items-center">
                                             <div class="d-flex align-items-center gap-2">
-                                                <span class="badge bg-primary text-white font-monospace">
+                                                <span class="badge bg-primary-lt font-monospace">
                                                     <i class="bi bi-clock me-1"></i>{{ substr($item['jam_mulai'], 0, 5) }} - {{ substr($item['jam_selesai'], 0, 5) }} WIB
                                                 </span>
                                                 <strong class="fs-4">{{ $j->mataPelajaran->nama }}</strong>
@@ -241,7 +237,7 @@
                                 <i class="bi bi-calendar-x fs-1 text-muted d-block mb-2"></i>
                                 <h4 class="text-secondary">Belum ada agenda kegiatan maupun jadwal pelajaran pada hari {{ $selectedHari }}.</h4>
                                 <div class="mt-3 d-flex justify-content-center gap-2">
-                                    <a href="{{ route('waka.kegiatan.create', ['hari' => $selectedHari]) }}" class="btn btn-sm btn-teal">
+                                    <a href="{{ route('waka.kegiatan.create', ['hari' => $selectedHari]) }}" class="btn btn-sm btn-outline-secondary">
                                         <i class="bi bi-calendar-plus me-1"></i>+ Tambah Kegiatan (Upacara/Istirahat)
                                     </a>
                                     <a href="{{ route('waka.jadwal.create') }}" class="btn btn-sm btn-primary">
@@ -263,7 +259,7 @@
                             <span class="align-self-center px-2 text-secondary fw-semibold small">Pilih Hari:</span>
                             @foreach($daftarHari as $h)
                                 <a href="{{ route('waka.jadwal.data', ['tab' => 'matriks', 'hari' => $h]) }}"
-                                   class="btn btn-sm {{ $selectedHari === $h ? 'btn-teal text-white' : 'btn-outline-secondary' }}">
+                                   class="btn btn-sm {{ $selectedHari === $h ? 'btn-primary' : 'btn-outline-secondary' }}">
                                     {{ $h }}
                                 </a>
                             @endforeach
@@ -292,7 +288,7 @@
                                     <th style="min-width: 120px;" class="text-start">Kelas</th>
                                     @foreach($daftarJamPelajaran as $jam)
                                         <th style="min-width: 140px;">
-                                            <span class="small text-secondary font-monospace" style="font-size: 0.75rem;">
+                                            <span class="small text-secondary font-monospace" style="font-size: var(--text-xs);">
                                                 {{ substr($jam->jam_mulai, 0, 5) }}-{{ substr($jam->jam_selesai, 0, 5) }}
                                             </span>
                                         </th>
@@ -316,11 +312,11 @@
                                             <td class="p-2 {{ $match ? 'bg-primary-lt' : '' }}">
                                                 @if($match)
                                                     <div class="fw-bold text-primary small">{{ $match->mataPelajaran->nama }}</div>
-                                                    <div class="text-secondary small" style="font-size: 0.75rem;">
+                                                    <div class="text-secondary small" style="font-size: var(--text-xs);">
                                                         <i class="bi bi-person me-1"></i>{{ Str::limit($match->guru->user->name ?? '-', 15) }}
                                                     </div>
                                                 @else
-                                                    <span class="text-muted" style="font-size: 0.75rem;">-</span>
+                                                    <span class="text-muted" style="font-size: var(--text-xs);">-</span>
                                                 @endif
                                             </td>
                                         @endforeach
@@ -348,7 +344,7 @@
                                 Kegiatan seperti Upacara, Istirahat, Apel Pagi, dan Senam berlaku untuk seluruh warga sekolah dan tidak menimbulkan tagihan absensi KBM.
                             </div>
                         </div>
-                        <a href="{{ route('waka.kegiatan.create') }}" class="btn btn-teal btn-sm">
+                        <a href="{{ route('waka.kegiatan.create') }}" class="btn btn-sm btn-outline-secondary">
                             <i class="bi bi-plus-lg me-1"></i>Tambah Kegiatan Sekolah
                         </a>
                     </div>
@@ -411,7 +407,7 @@
                                             <i class="bi bi-calendar-x fs-1 d-block mb-2 text-muted"></i>
                                             Belum ada kegiatan umum sekolah yang terdaftar.
                                             <div class="mt-2">
-                                                <a href="{{ route('waka.kegiatan.create') }}" class="btn btn-sm btn-teal">
+                                                <a href="{{ route('waka.kegiatan.create') }}" class="btn btn-sm btn-outline-secondary">
                                                     <i class="bi bi-plus-lg me-1"></i>Tambah Kegiatan Sekarang
                                                 </a>
                                             </div>

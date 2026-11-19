@@ -1,0 +1,51 @@
+{
+  "skill": "hallmark",
+  "version": "2.0.0",
+  "mode": "redesign",
+  "depth": "polish",
+  "scope": "app",
+  "genre": "modern-minimal (inferred)",
+  "date": "2026-11-18",
+  "framework": "Laravel Blade + Tabler",
+  "kept": [
+    "all routes and controllers",
+    "form actions, field names, ids, modal ids",
+    "GPS and journal JS wiring",
+    "shell structure (sidebar, topbar, bottom nav)"
+  ],
+  "files": {
+    "created": [
+      "public/css/tokens.css",
+      "public/css/base.css"
+    ],
+    "rewritten": [
+      "public/css/admin.css",
+      "public/css/guru-mobile.css",
+      "resources/views/auth/login.blade.php"
+    ],
+    "swept": [
+      "resources/views/admin/dashboard.blade.php",
+      "resources/views/admin/sekolah/setting.blade.php",
+      "resources/views/guru/dashboard.blade.php",
+      "resources/views/guru/izin.blade.php",
+      "resources/views/guru/jadwal.blade.php",
+      "resources/views/guru/riwayat.blade.php",
+      "resources/views/layouts/guru/main.blade.php",
+      "resources/views/layouts/waka/header.blade.php",
+      "resources/views/waka/absensi/cetak.blade.php",
+      "resources/views/waka/absensi/monitoring.blade.php",
+      "resources/views/waka/dashboard.blade.php",
+      "resources/views/waka/izin/data.blade.php",
+      "resources/views/waka/jadwal/data.blade.php",
+      "resources/views/waka/jadwal/tambah.blade.php",
+      "resources/views/waka/kegiatan/edit.blade.php",
+      "resources/views/waka/kegiatan/tambah.blade.php"
+    ]
+  },
+  "verification": {
+    "sloplint": "0 FAIL, 2 WARN (tokens nav-ink pairing, three filled primary recipes)",
+    "blade": "php artisan view:cache OK",
+    "tests": "23 passed (97 assertions)",
+    "render_tier": "not run: puppeteer-core not installed"
+  }
+}

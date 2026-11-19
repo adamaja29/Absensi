@@ -6,7 +6,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <h3 class="card-title">Data Tahun Ajaran</h3>
-                <div class="text-secondary mt-1" style="font-size: 0.875rem;">Kelola periode tahun ajaran dan semester.</div>
+                <div class="text-secondary mt-1" style="font-size: var(--text-sm);">Kelola periode tahun ajaran dan semester.</div>
             </div>
             <a href="{{ route('waka.tahun-ajaran.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i>

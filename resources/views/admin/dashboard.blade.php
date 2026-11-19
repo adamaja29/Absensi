@@ -81,30 +81,22 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="row g-3 mb-3">
-                        <div class="col-6 col-md-3">
-                            <div class="border rounded p-3">
-                                <div class="text-secondary small">Hadir</div>
-                                <div class="h2 mb-0 text-success">{{ $sudahHadir }}</div>
-                            </div>
+                    <div class="stat-row mb-3">
+                        <div class="stat-item">
+                            <div class="stat-label">Hadir</div>
+                            <div class="stat-value text-success">{{ $sudahHadir }}</div>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <div class="border rounded p-3">
-                                <div class="text-secondary small">Terlambat</div>
-                                <div class="h2 mb-0 text-warning">{{ $terlambat }}</div>
-                            </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Terlambat</div>
+                            <div class="stat-value text-warning">{{ $terlambat }}</div>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <div class="border rounded p-3">
-                                <div class="text-secondary small">Izin / Sakit</div>
-                                <div class="h2 mb-0 text-purple">{{ $izinSakit }}</div>
-                            </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Izin / Sakit</div>
+                            <div class="stat-value">{{ $izinSakit }}</div>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <div class="border rounded p-3">
-                                <div class="text-secondary small">Belum Absen</div>
-                                <div class="h2 mb-0 text-secondary">{{ $belumCheckIn }}</div>
-                            </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Belum Absen</div>
+                            <div class="stat-value text-secondary">{{ $belumCheckIn }}</div>
                         </div>
                     </div>
 

@@ -6,7 +6,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <h3 class="card-title">Data Jam Pelajaran (Sesi)</h3>
-                <div class="text-secondary mt-1" style="font-size: 0.875rem;">Atur urutan sesi dan rentang waktu mengajar di sekolah.</div>
+                <div class="text-secondary mt-1" style="font-size: var(--text-sm);">Atur urutan sesi dan rentang waktu mengajar di sekolah.</div>
             </div>
             <a href="{{ route('waka.jam-pelajaran.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i>

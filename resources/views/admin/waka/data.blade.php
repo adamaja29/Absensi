@@ -7,7 +7,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <h3 class="card-title">Data Waka</h3>
-                <div class="text-secondary mt-1" style="font-size: 0.875rem;">Kelola informasi data waka dan akun pengguna.</div>
+                <div class="text-secondary mt-1" style="font-size: var(--text-sm);">Kelola informasi data waka dan akun pengguna.</div>
             </div>
             <a href="{{ route('admin.waka.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i>

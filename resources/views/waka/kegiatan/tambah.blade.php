@@ -76,8 +76,8 @@
                                 <label class="form-label required">Jenis Kegiatan</label>
                                 <select name="jenis" class="form-select @error('jenis') is-invalid @enderror" required>
                                     <option value="">-- Pilih Jenis Kegiatan --</option>
-                                    <option value="upacara" {{ old('jenis') == 'upacara' ? 'selected' : '' }}>🇮🇩 Upacara Bendera</option>
-                                    <option value="istirahat" {{ old('jenis') == 'istirahat' ? 'selected' : '' }}>☕ Istirahat / Rehat</option>
+                                    <option value="upacara" {{ old('jenis') == 'upacara' ? 'selected' : '' }}>Upacara Bendera</option>
+                                    <option value="istirahat" {{ old('jenis') == 'istirahat' ? 'selected' : '' }}>Istirahat / Rehat</option>
                                     <option value="ibadah" {{ old('jenis') == 'ibadah' ? 'selected' : '' }}>🕌 Ibadah / Shalat Berjamaah</option>
                                     <option value="senam" {{ old('jenis') == 'senam' ? 'selected' : '' }}>🏃 Senam / Olahraga Bersama</option>
                                     <option value="literasi" {{ old('jenis') == 'literasi' ? 'selected' : '' }}>📖 Gerakan Literasi Sekolah</option>

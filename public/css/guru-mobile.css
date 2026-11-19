@@ -1,73 +1,98 @@
+/* Hallmark · checked: 2026-11-18 · genre: modern-minimal (inferred)
+ * floor: 0 FAIL · fixed: 12 (2a, 4, 6b, 10a, 15, 24a, 26a, 38iii, 54, 58, 63, 67)
+ * built: the project · redesign: polish · v2.0.0 */
+
+@import url("tokens.css");
+@import url("base.css");
+
 /* ========================================================
-   GURU MOBILE WEB APP STYLES
-   Optimized for Smartphone Screens & Thumb Interaction
+   GURU — phone-first surface, same system as the desktop app
    ======================================================== */
 
-:root {
-    --mobile-primary: #1e40af;
-    --mobile-primary-light: #eff6ff;
-    --mobile-accent: #0ea5e9;
-    --mobile-bg: #f8fafc;
-    --mobile-card: #ffffff;
-    --mobile-text: #0f172a;
-    --mobile-muted: #64748b;
-    --mobile-border: #e2e8f0;
-    --mobile-success: #10b981;
-    --mobile-warning: #f59e0b;
-    --mobile-danger: #ef4444;
-}
-
 body {
-    background-color: #0f172a; /* Dark background on desktop to highlight phone container */
-    color: var(--mobile-text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--color-paper-3);
+    color: var(--color-ink);
     margin: 0;
     padding: 0;
-    -webkit-font-smoothing: antialiased;
 }
 
-/* PHONE WRAPPER: Full width on mobile, sleek phone frame on desktop */
 .mobile-app-container {
-    max-width: 480px;
-    margin: 0 auto;
-    min-height: 100vh;
-    background-color: var(--mobile-bg);
     position: relative;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.35);
     display: flex;
     flex-direction: column;
+    max-width: 480px;
+    min-height: 100dvh;
+    margin: 0 auto;
+    background-color: var(--color-paper);
 }
 
-/* TOP APP BAR */
+@media (min-width: 481px) {
+    .mobile-app-container {
+        border-left: 1px solid var(--color-rule);
+        border-right: 1px solid var(--color-rule);
+    }
+}
+
+/* TOP APP BAR — solid navy, no gradient, no glow */
 .mobile-header {
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-    color: #ffffff;
-    padding: 16px 20px 20px 20px;
-    border-bottom-left-radius: 24px;
-    border-bottom-right-radius: 24px;
-    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2);
+    background-color: var(--color-nav-bg);
+    color: var(--color-nav-ink);
+    padding: var(--space-md) var(--space-lg);
+}
+
+.mobile-header .text-white {
+    color: var(--color-nav-ink) !important;
+}
+
+.mobile-header .text-white-50 {
+    color: var(--color-nav-muted) !important;
+}
+
+.mobile-header .badge {
+    background-color: var(--color-nav-bg-2);
+    color: var(--color-nav-ink);
+}
+
+.mobile-header .border-top {
+    border-top-color: var(--color-nav-bg-2) !important;
 }
 
 .mobile-header .user-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-nav-bg-2);
+    color: var(--color-nav-ink);
     font-size: 1.3rem;
-    border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.mobile-header .btn {
+    min-height: 40px;
+    border: 1px solid var(--color-nav-bg-2);
+    border-radius: var(--radius-control);
+    background-color: transparent;
+    color: var(--color-nav-ink);
+}
+
+.mobile-header .btn:hover,
+.mobile-header .btn:focus-visible {
+    background-color: var(--color-nav-muted);
+    border-color: var(--color-nav-muted);
+    color: var(--color-nav-bg);
 }
 
 /* MAIN CONTENT */
 .mobile-content {
     flex: 1;
-    padding: 16px;
-    padding-bottom: 90px; /* Space for sticky bottom nav */
+    padding: var(--space-md);
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0));
 }
 
-/* BOTTOM NAVIGATION BAR */
+/* BOTTOM NAVIGATION */
 .mobile-bottom-nav {
     position: fixed;
     bottom: 0;
@@ -75,130 +100,378 @@ body {
     transform: translateX(-50%);
     width: 100%;
     max-width: 480px;
-    height: 68px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid var(--mobile-border);
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    z-index: 1040;
+    height: 64px;
     padding-bottom: env(safe-area-inset-bottom, 0);
-    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+    background-color: var(--color-paper-2);
+    border-top: 1px solid var(--color-rule);
+    box-shadow: none;
+    backdrop-filter: none;
+    z-index: var(--z-sticky-nav);
 }
 
 .nav-item-mobile {
     display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-decoration: none;
-    color: var(--mobile-muted);
-    font-size: 0.72rem;
+    gap: var(--space-3xs);
+    padding: var(--space-xs) 0;
+    color: var(--color-muted);
+    font-size: var(--text-xs);
     font-weight: 500;
-    flex: 1;
-    padding: 6px 0;
-    transition: all 0.2s ease;
+    text-decoration: none;
+    transition: color var(--dur-micro) var(--ease-out);
 }
 
 .nav-item-mobile i {
-    font-size: 1.35rem;
-    margin-bottom: 3px;
-    transition: transform 0.2s ease;
+    font-size: 1.25rem;
+    transition: color var(--dur-micro) var(--ease-out);
+}
+
+.nav-item-mobile:hover,
+.nav-item-mobile:focus-visible {
+    color: var(--color-ink-2);
 }
 
 .nav-item-mobile.active {
-    color: var(--mobile-primary);
-    font-weight: 700;
+    color: var(--color-accent);
+    font-weight: 600;
 }
 
 .nav-item-mobile.active i {
-    transform: translateY(-2px);
-    color: #2563eb;
+    color: var(--color-accent);
+    transform: none;
 }
 
-/* CARDS IN MOBILE */
+/* CARDS */
 .card-mobile {
-    background: #ffffff;
-    border-radius: 18px;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-    margin-bottom: 14px;
+    margin-bottom: var(--space-sm);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-card);
+    background-color: var(--color-paper-2);
+    box-shadow: none;
     overflow: hidden;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: none;
 }
 
 .card-mobile:active {
-    transform: scale(0.99);
+    transform: none;
 }
 
-/* TOUCH-FRIENDLY BUTTONS */
-.btn-mobile-primary {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    color: #ffffff;
-    border: none;
-    border-radius: 14px;
-    padding: 12px 18px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+.card-mobile .card-header,
+.card-mobile .card-body {
+    border-color: var(--color-rule);
 }
 
-.btn-mobile-success {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: #ffffff;
-    border: none;
-    border-radius: 14px;
-    padding: 14px 20px;
-    font-size: 1rem;
-    font-weight: 700;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+.card-mobile.border-warning,
+.card-mobile.border-danger,
+.card-mobile.border-success,
+.card-mobile.border-teal {
+    border-color: var(--color-rule-2);
 }
 
-.btn-mobile-outline {
-    background: transparent;
-    color: var(--mobile-primary);
-    border: 1.5px solid var(--mobile-primary);
-    border-radius: 12px;
-    padding: 8px 14px;
-    font-size: 0.85rem;
-    font-weight: 600;
+/* Inner well used by forms and record detail */
+.well {
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-control);
+    background-color: var(--color-paper-3);
+}
+
+.kegiatan-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    flex-shrink: 0;
+    color: var(--color-ink-2);
+    font-size: var(--text-lg);
+    line-height: 1;
+}
+
+/* Tabler buttons on the phone resolve to the same tokens */
+.mobile-content .btn {
+    min-height: 38px;
+    border-radius: var(--radius-control);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    box-shadow: none;
+    transition: background-color var(--dur-micro) var(--ease-out),
+        border-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+}
+
+.mobile-content .btn:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+}
+
+.mobile-content .btn-primary {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent);
+    color: var(--color-accent-ink);
+}
+
+.mobile-content .btn-primary:hover {
+    border-color: var(--color-accent-hover);
+    background-color: var(--color-accent-hover);
+    color: var(--color-accent-ink);
+}
+
+.mobile-content .btn-secondary {
+    border-color: var(--color-rule-2);
+    background-color: var(--color-paper-3);
+    color: var(--color-ink-2);
+}
+
+.mobile-content .btn-outline-primary {
+    border-color: var(--color-rule-2);
+    background-color: transparent;
+    color: var(--color-accent);
+}
+
+.mobile-content .btn-outline-primary:hover {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent-hover);
+}
+
+.mobile-content .btn-outline-secondary {
+    border-color: var(--color-rule-2);
+    background-color: transparent;
+    color: var(--color-ink-2);
+}
+
+.mobile-content .btn-outline-secondary:hover {
+    border-color: var(--color-rule-2);
+    background-color: var(--color-paper-3);
+    color: var(--color-ink);
+}
+
+/* BUTTONS — one primary style, 44px touch target */
+.btn-mobile-primary,
+.btn-mobile-success,
+.btn-mobile-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    min-height: 44px;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-control);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    line-height: 1.2;
     text-decoration: none;
+    box-shadow: none;
+    transition: background-color var(--dur-micro) var(--ease-out),
+        border-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
 }
 
-/* LIVE PULSE ANIMATION FOR ACTIVE LESSON */
-@keyframes pulseGlow {
-    0% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-    }
+.btn-mobile-primary,
+.btn-mobile-success {
+    width: 100%;
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-accent);
+    color: var(--color-accent-ink);
 }
 
-.pulse-badge {
-    animation: pulseGlow 2s infinite;
+.btn-mobile-primary:hover,
+.btn-mobile-primary:focus-visible,
+.btn-mobile-success:hover,
+.btn-mobile-success:focus-visible {
+    background-color: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    color: var(--color-accent-ink);
 }
 
-/* BOTTOM SHEET MODAL ON MOBILE */
+.btn-mobile-primary:active,
+.btn-mobile-success:active {
+    transform: none;
+}
+
+.btn-mobile-outline {
+    border: 1px solid var(--color-rule-2);
+    background-color: transparent;
+    color: var(--color-accent);
+}
+
+.btn-mobile-outline:hover,
+.btn-mobile-outline:focus-visible {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent-hover);
+}
+
+/* TABLES on the phone: row rules, sentence-case heads */
+.mobile-content .table {
+    font-size: var(--text-sm);
+}
+
+.mobile-content .table > thead > tr > th {
+    padding: var(--space-xs) var(--space-sm);
+    border-bottom: 1px solid var(--color-rule-2);
+    background-color: transparent;
+    color: var(--color-muted);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.mobile-content .table > tbody > tr > td {
+    padding: var(--space-sm);
+    border-bottom: 1px solid var(--color-rule);
+    color: var(--color-ink);
+}
+
+.mobile-content .table > tbody > tr:last-child > td {
+    border-bottom: 0;
+}
+
+/* FORMS */
+.mobile-content .form-label {
+    margin-bottom: var(--space-2xs);
+    color: var(--color-ink-2);
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.mobile-content .form-control,
+.mobile-content .form-select {
+    min-height: 44px;
+    border: 1px solid var(--color-rule-2);
+    border-radius: var(--radius-control);
+    background-color: var(--color-paper-2);
+    color: var(--color-ink);
+    font-size: var(--text-base);
+}
+
+.mobile-content .form-control:focus,
+.mobile-content .form-select:focus {
+    border-color: var(--color-accent);
+    outline: 2px solid var(--color-accent-soft);
+    outline-offset: 0;
+    box-shadow: none;
+}
+
+.mobile-content .form-control::placeholder {
+    color: var(--color-muted);
+}
+
+/* STATUS BADGES */
+.mobile-content .badge {
+    padding: var(--space-3xs) var(--space-xs);
+    border-radius: 6px;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.bg-success-lt {
+    background-color: var(--color-success-soft) !important;
+    color: var(--color-success) !important;
+}
+
+.bg-warning-lt {
+    background-color: var(--color-warning-soft) !important;
+    color: var(--color-warning) !important;
+}
+
+.bg-purple-lt {
+    background-color: var(--color-paper-3) !important;
+    color: var(--color-ink-2) !important;
+}
+
+.bg-danger-lt {
+    background-color: var(--color-error-soft) !important;
+    color: var(--color-error) !important;
+}
+
+.bg-primary-lt,
+.bg-azure-lt,
+.bg-teal-lt {
+    background-color: var(--color-accent-soft) !important;
+    color: var(--color-accent) !important;
+}
+
+.bg-secondary-lt {
+    background-color: var(--color-paper-3) !important;
+    color: var(--color-ink-2) !important;
+}
+
+.bg-info-lt {
+    background-color: var(--color-accent-soft) !important;
+    color: var(--color-accent) !important;
+}
+
+.text-info,
+.text-indigo,
+.text-teal,
+.text-azure {
+    color: var(--color-accent) !important;
+}
+
+.text-purple {
+    color: var(--color-ink-2) !important;
+}
+
+.bg-primary {
+    background-color: var(--color-accent) !important;
+}
+
+.bg-success {
+    background-color: var(--color-success) !important;
+}
+
+.bg-warning {
+    background-color: var(--color-warning) !important;
+}
+
+.bg-danger {
+    background-color: var(--color-error) !important;
+}
+
+.bg-secondary {
+    background-color: var(--color-paper-3) !important;
+    color: var(--color-ink-2) !important;
+}
+
+.text-success {
+    color: var(--color-success) !important;
+}
+
+.text-warning {
+    color: var(--color-warning) !important;
+}
+
+.text-danger {
+    color: var(--color-error) !important;
+}
+
+.text-purple {
+    color: var(--color-violet) !important;
+}
+
+.text-primary {
+    color: var(--color-accent) !important;
+}
+
+.text-secondary,
+.text-muted {
+    color: var(--color-muted) !important;
+}
+
+.text-azure,
+.text-teal {
+    color: var(--color-accent) !important;
+}
+
+/* BOTTOM SHEET */
 @media (max-width: 576px) {
     .modal-dialog-bottom {
         position: fixed;
@@ -208,12 +481,41 @@ body {
         margin: 0;
         max-width: 100%;
     }
+
     .modal-dialog-bottom .modal-content {
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        border-top-left-radius: 24px;
-        border-top-right-radius: 24px;
-        border: none;
-        box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15);
+        border: 0;
+        border-radius: var(--radius-card) var(--radius-card) 0 0;
+        box-shadow: var(--shadow-pop);
     }
+}
+
+/* ALERTS */
+.mobile-content .alert {
+    border-width: 1px;
+    border-radius: var(--radius-control);
+    font-size: var(--text-sm);
+}
+
+.mobile-content .alert-success {
+    background-color: var(--color-success-soft);
+    border-color: var(--color-success);
+    color: var(--color-success);
+}
+
+.mobile-content .alert-danger {
+    background-color: var(--color-error-soft);
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+.mobile-content .alert-warning {
+    background-color: var(--color-warning-soft);
+    border-color: var(--color-warning);
+    color: var(--color-ink-2);
+}
+
+.mobile-content .alert-info {
+    background-color: var(--color-accent-soft);
+    border-color: var(--color-accent);
+    color: var(--color-ink-2);
 }

@@ -10,6 +10,7 @@ use App\Models\JamPelajaran;
 use App\Models\KegiatanSekolah;
 use App\Models\SekolahSetting;
 use App\Models\tahunAjaran;
+use App\Support\AbsenceBlockResolver;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,56 +18,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class guruController extends Controller
 {
-    /**
-     * Map touching same-subject schedule rows to one meeting. A real clock gap
-     * such as a school break starts a separate meeting.
-     */
-    private function getAbsenceBlocks($schedules): array
-    {
-        $schedules->loadMissing(['jamMulai', 'jamSelesai']);
-
-        $groups = $schedules->groupBy(fn ($schedule) => implode('|', [
-            $schedule->tahun_ajaran_id,
-            $schedule->guru_id,
-            $schedule->kelas_id,
-            $schedule->mata_pelajaran_id,
-            $schedule->hari,
-        ]));
-
-        $blocks = [];
-        foreach ($groups as $group) {
-            $ranges = $group->map(fn ($schedule) => [
-                'id' => $schedule->id,
-                'start' => $schedule->jamMulai->jam_mulai,
-                'end' => $schedule->jamSelesai->jam_selesai,
-            ])->sortBy('start')->values();
-
-            $current = [];
-            $currentEnd = null;
-            foreach ($ranges as $range) {
-                if ($current && $range['start'] !== $currentEnd) {
-                    foreach ($current as $id) {
-                        $blocks[$id] = $current;
-                    }
-                    $current = [];
-                    $currentEnd = null;
-                }
-
-                $current[] = $range['id'];
-                $currentEnd = $range['end'];
-            }
-
-            foreach ($current as $id) {
-                $blocks[$id] = $current;
-            }
-        }
-
-        return $blocks;
-    }
-
     private function getGuruProfile(): guru
     {
         $user = Auth::user();
@@ -107,13 +62,6 @@ class guruController extends Controller
             ->whereDate('tanggal_selesai', '>=', $today)
             ->first();
 
-        // Ambil kegiatan sekolah umum hari ini (Upacara, Istirahat, dsb)
-        $kegiatanHariIni = KegiatanSekolah::query()
-            ->when($tahunAktif, fn ($q) => $q->where('tahun_ajaran_id', $tahunAktif->id))
-            ->where('hari', $hariIni)
-            ->orderBy('jam_mulai')
-            ->get();
-
         $query = JadwalPelajaran::with(['kelas', 'mataPelajaran', 'jamMulai', 'jamSelesai', 'absensi' => function ($q) use ($today) {
             $q->whereDate('tanggal', $today);
         }])
@@ -130,7 +78,8 @@ class guruController extends Controller
                 ->whereColumn('jam_pelajaran.id', 'jadwal_pelajaran.jam_pelajaran_mulai_id'))
             ->get();
 
-        $absenceBlocks = $this->getAbsenceBlocks($jadwalHariIni);
+        $absenceBlocks = AbsenceBlockResolver::resolve($jadwalHariIni);
+        $schedulesById = $jadwalHariIni->keyBy('id');
         $absensiHariIni = AbsensiGuru::where('guru_id', $guru->id)
             ->whereDate('tanggal', $today)
             ->get()
@@ -139,12 +88,18 @@ class guruController extends Controller
         // Tambahkan metadata status realtime ke setiap item jadwal
         foreach ($jadwalHariIni as $j) {
             $blockIds = $absenceBlocks[$j->id] ?? [$j->id];
+            $blockSchedules = collect($blockIds)
+                ->map(fn ($id) => $schedulesById->get($id))
+                ->filter()
+                ->sortBy(fn ($schedule) => $schedule->jamMulai->urutan)
+                ->values();
+            $meetingStart = $blockSchedules->first()->jamMulai->jam_mulai;
+            $meetingEnd = $blockSchedules->last()->jamSelesai->jam_selesai;
+            $j->meeting_start = $meetingStart;
+            $j->meeting_end = $meetingEnd;
             $absen = $absensiHariIni->first(fn ($record) => in_array($record->jadwal_pelajaran_id, $blockIds, true))
                 ?? $j->absensi->first();
             $j->absen_record = $absen;
-
-            $jamMulai = $j->jamMulai->jam_mulai;
-            $jamSelesai = $j->jamSelesai->jam_selesai;
 
             if (!$isPublished) {
                 $j->live_status = 'draft';
@@ -156,16 +111,16 @@ class guruController extends Controller
                 $j->live_status = 'izin_sakit';
                 $j->can_absen = false;
             } else {
-                if ($currentTime < $jamMulai) {
+                if ($currentTime < $meetingStart) {
                     $j->live_status = 'belum_mulai';
                     $j->can_absen = false;
-                } elseif ($currentTime >= $jamMulai && $currentTime <= $jamSelesai) {
+                } elseif ($currentTime <= $meetingEnd) {
                     $j->live_status = 'berlangsung';
                     $j->can_absen = true;
 
                     // Cek apakah sudah lewat toleransi keterlambatan
                     $toleransiMenit = $setting->toleransi_terlambat_menit ?? 15;
-                    $batasToleransi = Carbon::parse($jamMulai)->addMinutes($toleransiMenit)->format('H:i:s');
+                    $batasToleransi = Carbon::parse($meetingStart)->addMinutes($toleransiMenit)->format('H:i:s');
                     $j->is_late = ($currentTime > $batasToleransi);
                 } else {
                     // Sesi pelajaran sudah lewat/habis
@@ -175,26 +130,16 @@ class guruController extends Controller
             }
         }
 
-        $agendaHariIni = $kegiatanHariIni->map(fn ($kegiatan) => [
-            'type' => 'kegiatan',
-            'jam_mulai' => $kegiatan->jam_mulai,
-            'jam_selesai' => $kegiatan->jam_selesai,
-            'data' => $kegiatan,
-        ])->concat($jadwalHariIni->map(fn ($jadwal) => [
-            'type' => 'jadwal',
-            'jam_mulai' => $jadwal->jamMulai->jam_mulai,
-            'jam_selesai' => $jadwal->jamSelesai->jam_selesai,
-            'data' => $jadwal,
-        ]));
-
-        $jadwalBerlangsung = $agendaHariIni->filter(
-            fn ($agenda) => $agenda['type'] === 'jadwal' && $agenda['data']->live_status === 'berlangsung'
-        );
-        $agendaHariIni = $jadwalBerlangsung
-            ->concat($agendaHariIni
-                ->reject(fn ($agenda) => $agenda['type'] === 'jadwal' && $agenda['data']->live_status === 'berlangsung')
-                ->sortBy('jam_mulai'))
+        $jadwalBerlangsung = $jadwalHariIni->filter(fn ($j) => $j->live_status === 'berlangsung');
+        $jadwalHariIni = $jadwalBerlangsung
+            ->concat($jadwalHariIni->reject(fn ($j) => $j->live_status === 'berlangsung'))
             ->values();
+
+        $jadwalUtama = $isPublished
+            ? ($jadwalHariIni->firstWhere('live_status', 'berlangsung')
+                ?? $jadwalHariIni->first(fn ($j) => $j->jamMulai->jam_mulai > $currentTime)
+                ?? $jadwalHariIni->last())
+            : $jadwalHariIni->first();
 
         // Statistik singkat guru
         $totalJadwalHariIni = $jadwalHariIni->count();
@@ -208,10 +153,9 @@ class guruController extends Controller
             'currentTime',
             'tahunAktif',
             'isPublished',
-            'kegiatanHariIni',
             'setting',
             'jadwalHariIni',
-            'agendaHariIni',
+            'jadwalUtama',
             'izinAktif',
             'totalJadwalHariIni',
             'totalSudahAbsen',
@@ -264,16 +208,7 @@ class guruController extends Controller
             return back()->withErrors(['absensi' => "Jadwal ini untuk hari {$jadwal->hari}, bukan hari {$hariIni}."]);
         }
 
-        if ($currentTime < $jadwal->jamMulai->jam_mulai) {
-            return back()->withErrors(['absensi' => 'Sesi pelajaran belum dimulai. Absensi dapat dilakukan setelah jam mulai.']);
-        }
-
-        // Validasi waktu: jangan sampai sesi pelajaran sudah berakhir
-        if ($currentTime > $jadwal->jamSelesai->jam_selesai) {
-            return back()->withErrors(['absensi' => 'Sesi pelajaran telah selesai. Tombol absensi sudah tidak dapat digunakan.']);
-        }
-
-        // Absensi berlaku untuk seluruh sesi berurutan dengan kelas dan mapel yang sama.
+        // Absensi berlaku untuk sesi mapel yang sama, termasuk jeda istirahat di antaranya.
         $jadwalDalamHari = JadwalPelajaran::query()
             ->where('tahun_ajaran_id', $jadwal->tahun_ajaran_id)
             ->where('guru_id', $jadwal->guru_id)
@@ -281,7 +216,21 @@ class guruController extends Controller
             ->where('mata_pelajaran_id', $jadwal->mata_pelajaran_id)
             ->where('hari', $jadwal->hari)
             ->get();
-        $blockIds = $this->getAbsenceBlocks($jadwalDalamHari)[$jadwal->id] ?? [$jadwal->id];
+        $blockIds = AbsenceBlockResolver::resolve($jadwalDalamHari)[$jadwal->id] ?? [$jadwal->id];
+        $blockSchedules = $jadwalDalamHari
+            ->whereIn('id', $blockIds)
+            ->sortBy(fn ($schedule) => $schedule->jamMulai->urutan)
+            ->values();
+        $meetingStart = $blockSchedules->first()->jamMulai->jam_mulai;
+        $meetingEnd = $blockSchedules->last()->jamSelesai->jam_selesai;
+
+        if ($currentTime < $meetingStart) {
+            return back()->withErrors(['absensi' => 'Sesi pelajaran belum dimulai. Absensi dapat dilakukan setelah jam mulai.']);
+        }
+
+        if ($currentTime > $meetingEnd) {
+            return back()->withErrors(['absensi' => 'Rangkaian sesi pelajaran telah selesai. Tombol absensi sudah tidak dapat digunakan.']);
+        }
 
         $sudahAda = AbsensiGuru::whereIn('jadwal_pelajaran_id', $blockIds)
             ->whereDate('tanggal', $today)
@@ -308,7 +257,7 @@ class guruController extends Controller
 
         // Tentukan status kehadiran (tepat waktu atau terlambat)
         $toleransiMenit = $setting->toleransi_terlambat_menit ?? 15;
-        $batasToleransi = Carbon::parse($jadwal->jamMulai->jam_mulai)->addMinutes($toleransiMenit)->format('H:i:s');
+        $batasToleransi = Carbon::parse($meetingStart)->addMinutes($toleransiMenit)->format('H:i:s');
         $status = ($currentTime > $batasToleransi) ? 'terlambat' : 'hadir';
 
         AbsensiGuru::create([
@@ -446,6 +395,14 @@ class guruController extends Controller
             ->with('success', 'Pengajuan izin/sakit berhasil dikirim dan sedang menunggu persetujuan Waka.');
     }
 
+    public function buktiIzin(IzinGuru $izin): Response
+    {
+        $guru = $this->getGuruProfile();
+        abort_if($izin->guru_id !== $guru->id, 403, 'Anda tidak memiliki akses ke lampiran ini.');
+
+        return $this->serveBuktiIzin($izin);
+    }
+
     // ==========================================
     // FORMULA HAVERSINE (JARAK DALAM METER)
     // ==========================================
@@ -463,5 +420,80 @@ class guruController extends Controller
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
         return (int) round($earthRadius * $c);
+    }
+
+    // ==========================================
+    // PROFIL PENGGUNA (GURU)
+    // ==========================================
+    public function profile(): View
+    {
+        $user = Auth::user();
+        $guru = $user->guru;
+
+        $mapelDiampu = collect();
+        $totalJamMengajar = 0;
+
+        if ($guru) {
+            $jadwalList = JadwalPelajaran::where('guru_id', $guru->id)
+                ->with(['mataPelajaran', 'kelas'])
+                ->get();
+
+            $mapelDiampu = $jadwalList->pluck('mataPelajaran.nama')->filter()->unique()->values();
+            $totalJamMengajar = $jadwalList->count();
+        }
+
+        return view('guru.profile', compact('user', 'guru', 'mapelDiampu', 'totalJamMengajar'));
+    }
+
+    public function updateProfile(Request $request): RedirectResponse
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $guru = $user->guru;
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
+            'no_hp' => ['nullable', 'string', 'max:20'],
+            'nip' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('guru', 'nip')->ignore($guru?->id),
+            ],
+            'current_password' => ['nullable', 'required_with:password', 'current_password'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ], [
+            'current_password.current_password' => 'Password saat ini tidak sesuai.',
+            'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+            'password.min' => 'Password baru minimal 8 karakter.',
+            'nip.unique' => 'NIP sudah terdaftar untuk guru lain.',
+        ]);
+
+        $userData = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ];
+
+        if (!empty($validated['password'])) {
+            $userData['password'] = $validated['password'];
+        }
+
+        $user->update($userData);
+
+        if ($guru) {
+            $guru->update([
+                'nip' => $validated['nip'] ?? $guru->nip,
+                'no_hp' => $validated['no_hp'],
+            ]);
+        }
+
+        return redirect()->route('guru.profile')
+            ->with('success', 'Profil Anda berhasil diperbarui.');
     }
 }

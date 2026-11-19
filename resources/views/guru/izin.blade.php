@@ -10,7 +10,7 @@
 </div>
 
 @if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show p-3 mb-3 border-0 shadow-sm" role="alert" style="border-radius: 14px;">
+    <div class="alert alert-success alert-dismissible fade show p-3 mb-3" role="alert" >
         <div class="d-flex align-items-center gap-2">
             <i class="bi bi-check-circle-fill fs-3 text-success"></i>
             <div>
@@ -23,7 +23,7 @@
 @endif
 
 @if ($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show p-3 mb-3 border-0 shadow-sm" role="alert" style="border-radius: 14px;">
+    <div class="alert alert-danger alert-dismissible fade show p-3 mb-3" role="alert" >
         <div class="fw-bold small mb-1">Pengajuan Gagal:</div>
         <ul class="mb-0 ps-3 small">
             @foreach ($errors->all() as $error)
@@ -51,7 +51,7 @@
         @csrf
         <div class="mb-3">
             <label class="form-label required small fw-bold">Jenis Pengajuan</label>
-            <select name="jenis" class="form-select" style="border-radius: 10px;" required>
+            <select name="jenis" class="form-select"  required>
                 <option value="izin" {{ old('jenis') == 'izin' ? 'selected' : '' }}>Izin (Keperluan Pribadi / Tugas Luar)</option>
                 <option value="sakit" {{ old('jenis') == 'sakit' ? 'selected' : '' }}>Sakit</option>
             </select>
@@ -60,23 +60,23 @@
         <div class="row g-2 mb-3">
             <div class="col-6">
                 <label class="form-label required small fw-bold">Tanggal Mulai</label>
-                <input type="date" name="tanggal_mulai" class="form-control" value="{{ old('tanggal_mulai', now()->toDateString()) }}" style="border-radius: 10px;" required>
+                <input type="date" name="tanggal_mulai" class="form-control" value="{{ old('tanggal_mulai', now()->toDateString()) }}"  required>
             </div>
             <div class="col-6">
                 <label class="form-label required small fw-bold">Tanggal Selesai</label>
-                <input type="date" name="tanggal_selesai" class="form-control" value="{{ old('tanggal_selesai', now()->toDateString()) }}" style="border-radius: 10px;" required>
+                <input type="date" name="tanggal_selesai" class="form-control" value="{{ old('tanggal_selesai', now()->toDateString()) }}"  required>
             </div>
         </div>
 
         <div class="mb-3">
             <label class="form-label required small fw-bold">Alasan Berhalangan Hadir</label>
-            <textarea name="alasan" class="form-control" rows="3" placeholder="Tuliskan keterangan / alasan ketidakhadiran..." style="border-radius: 10px;" required>{{ old('alasan') }}</textarea>
+            <textarea name="alasan" class="form-control" rows="3" placeholder="Tuliskan keterangan / alasan ketidakhadiran..."  required>{{ old('alasan') }}</textarea>
         </div>
 
         <div class="mb-3">
             <label class="form-label small fw-bold">Foto / Dokumen Surat Keterangan (Opsional)</label>
-            <input type="file" name="bukti_file" class="form-control" accept="image/*,.pdf" style="border-radius: 10px;">
-            <div class="text-secondary" style="font-size: 0.72rem; margin-top: 4px;">Foto surat dokter atau surat izin (JPG, PNG, PDF maks 3MB).</div>
+            <input type="file" name="bukti_file" class="form-control" accept="image/*,.pdf" >
+            <div class="text-secondary" style="font-size: var(--text-xs); margin-top: var(--space-2xs);">Foto surat dokter atau surat izin (JPG, PNG, PDF maks 3MB).</div>
         </div>
 
         <button type="submit" class="btn-mobile-primary mt-2">
@@ -97,7 +97,7 @@
                 @endif
 
                 @if($item->status === 'menunggu')
-                    <span class="badge bg-warning-lt">Menunggu ACC</span>
+                    <span class="badge bg-warning-lt">Menunggu persetujuan</span>
                 @elseif($item->status === 'disetujui')
                     <span class="badge bg-success-lt"><i class="bi bi-check2 me-1"></i>Disetujui</span>
                 @else
@@ -112,14 +112,14 @@
             <div class="text-secondary small mb-2">{{ $item->alasan }}</div>
 
             @if($item->catatan_waka)
-                <div class="p-2 bg-body-tertiary rounded-3 small border mb-2">
+                <div class="well p-2 small mb-2">
                     <span class="text-secondary fw-semibold">Catatan Waka:</span> {{ $item->catatan_waka }}
                 </div>
             @endif
 
             @if($item->bukti_file)
                 <div class="mt-2 pt-2 border-top">
-                    <a href="{{ asset('storage/' . $item->bukti_file) }}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill px-3">
+                    <a href="{{ route('guru.izin.bukti', $item) }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                         <i class="bi bi-paperclip me-1"></i>Lihat Lampiran Surat
                     </a>
                 </div>

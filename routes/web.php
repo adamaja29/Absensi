@@ -51,6 +51,9 @@ Route::middleware(['role:guru'])->group(function () {
     Route::get('/guru/riwayat', [guruController::class, 'riwayatAbsensi'])->name('guru.riwayat');
     Route::get('/guru/izin', [guruController::class, 'izin'])->name('guru.izin');
     Route::post('/guru/izin', [guruController::class, 'storeIzin'])->name('guru.izin.store');
+    Route::get('/guru/izin/{izin}/bukti', [guruController::class, 'buktiIzin'])->name('guru.izin.bukti');
+    Route::get('/guru/profil', [guruController::class, 'profile'])->name('guru.profile');
+    Route::put('/guru/profil', [guruController::class, 'updateProfile'])->name('guru.profile.update');
 });
 
 // ========================================================
@@ -58,6 +61,8 @@ Route::middleware(['role:guru'])->group(function () {
 // ========================================================
 Route::middleware(['role:waka'])->group(function () {
     Route::get('/waka/dashboard', [wakaController::class, 'dashboard'])->name('waka.dashboard');
+    Route::get('/waka/profil', [wakaController::class, 'profile'])->name('waka.profile');
+    Route::put('/waka/profil', [wakaController::class, 'updateProfile'])->name('waka.profile.update');
 
     // Kelola Guru
     Route::get('/waka/guru/data', [wakaController::class, 'dataGuru'])->name('waka.guru.data');
@@ -106,9 +111,9 @@ Route::middleware(['role:waka'])->group(function () {
     Route::get('/waka/jadwal/preview', [wakaController::class, 'previewJadwal'])->name('waka.jadwal.preview');
     Route::post('/waka/jadwal/cek-bentrok', [wakaController::class, 'checkJadwalConflict'])->name('waka.jadwal.check');
     Route::post('/waka/jadwal', [wakaController::class, 'storeJadwal'])->name('waka.jadwal.store');
-    Route::get('/waka/jadwal/{jadwal}/edit', [wakaController::class, 'editJadwal'])->name('waka.jadwal.edit');
-    Route::put('/waka/jadwal/{jadwal}', [wakaController::class, 'updateJadwal'])->name('waka.jadwal.update');
-    Route::delete('/waka/jadwal/{jadwal}', [wakaController::class, 'destroyJadwal'])->name('waka.jadwal.destroy');
+    Route::get('/waka/jadwal/{jadwal}/edit', [wakaController::class, 'editJadwal'])->name('waka.jadwal.edit')->whereNumber('jadwal');
+    Route::put('/waka/jadwal/{jadwal}', [wakaController::class, 'updateJadwal'])->name('waka.jadwal.update')->whereNumber('jadwal');
+    Route::delete('/waka/jadwal/{jadwal}', [wakaController::class, 'destroyJadwal'])->name('waka.jadwal.destroy')->whereNumber('jadwal');
 
     // Kegiatan Sekolah (Upacara, Istirahat, Apel, dsb)
     Route::get('/waka/kegiatan/tambah', [wakaController::class, 'createKegiatan'])->name('waka.kegiatan.create');
@@ -123,5 +128,6 @@ Route::middleware(['role:waka'])->group(function () {
 
     // Pengelolaan Izin / Sakit
     Route::get('/waka/izin/data', [wakaController::class, 'dataIzin'])->name('waka.izin.data');
+    Route::get('/waka/izin/{izin}/bukti', [wakaController::class, 'buktiIzin'])->name('waka.izin.bukti');
     Route::put('/waka/izin/{izin}', [wakaController::class, 'updateStatusIzin'])->name('waka.izin.update');
 });

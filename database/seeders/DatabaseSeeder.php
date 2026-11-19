@@ -38,9 +38,20 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Lukman Hakim', 'email' => 'lukman@gmail.com', 'role' => 'guru'],
             ['name' => 'Maria Fitri', 'email' => 'maria@gmail.com', 'role' => 'guru'],
             ['name' => 'Nadia Putri', 'email' => 'nadia@gmail.com', 'role' => 'guru'],
+            ['name' => 'Oki Pratama', 'email' => 'oki@gmail.com', 'role' => 'guru'],
+            ['name' => 'Putri Rahayu', 'email' => 'putri@gmail.com', 'role' => 'guru'],
+            ['name' => 'Qori Anggraini', 'email' => 'qori@gmail.com', 'role' => 'guru'],
+            ['name' => 'Rian Hidayat', 'email' => 'rian@gmail.com', 'role' => 'guru'],
+            ['name' => 'Siti Aminah', 'email' => 'siti@gmail.com', 'role' => 'guru'],
+            ['name' => 'Taufik Ismail', 'email' => 'taufik@gmail.com', 'role' => 'guru'],
+            ['name' => 'Utami Dewi', 'email' => 'utami@gmail.com', 'role' => 'guru'],
+            ['name' => 'Wahyu Setiawan', 'email' => 'wahyu@gmail.com', 'role' => 'guru'],
+            ['name' => 'Yuni Astuti', 'email' => 'yuni@gmail.com', 'role' => 'guru'],
+            ['name' => 'Zainal Abidin', 'email' => 'zainal@gmail.com', 'role' => 'guru'],
         ];
 
         $guruList = [];
+        $guruByEmail = [];
         foreach ($users as $index => $userData) {
             $user = User::updateOrCreate(
                 ['email' => $userData['email']],
@@ -51,13 +62,15 @@ class DatabaseSeeder extends Seeder
                 continue;
             }
 
-            $guruList[] = guru::updateOrCreate(
+            $guruModel = guru::updateOrCreate(
                 ['user_id' => $user->id],
                 [
                     'nip' => sprintf('1988%02d%02d2010%02d%04d', $index + 1, $index + 1, $index + 1, $index + 1),
                     'no_hp' => sprintf('0812%08d', $index + 1),
                 ]
             );
+            $guruList[] = $guruModel;
+            $guruByEmail[$userData['email']] = $guruModel;
         }
 
         SekolahSetting::firstOrCreate([], [
@@ -124,20 +137,55 @@ class DatabaseSeeder extends Seeder
             ['BK', 'Bimbingan dan Konseling'],
         ];
 
-        $mapelUmumList = [];
         $mapelList = [];
         foreach ($mapelUmum as [$kode, $nama]) {
             $mapelList[$kode] = MataPelajaran::updateOrCreate(
                 ['nama' => $nama],
                 ['kode' => $kode]
             );
-            $mapelUmumList[$kode] = $mapelList[$kode];
         }
         foreach (array_merge(...array_values($jurusanMapel)) as [$kode, $nama]) {
             $mapelList[$kode] = MataPelajaran::updateOrCreate(
                 ['nama' => $nama],
                 ['kode' => $kode]
             );
+        }
+
+        // Pemetaan guru pengampu (1 guru hanya mengampu 1 maksimal 2 mapel)
+        $guruMapelMap = [
+            'guru@gmail.com'    => ['MTK'],          // Budi Santoso (1 mapel)
+            'andi@gmail.com'    => ['INF'],          // Andi Saputra (1 mapel)
+            'citra@gmail.com'   => ['BIN'],          // Citra Lestari (1 mapel)
+            'dedi@gmail.com'    => ['BIG'],          // Dedi Kurniawan (1 mapel)
+            'eka@gmail.com'     => ['PPKN', 'SEJ'],  // Eka Pratiwi (2 mapel)
+            'fajar@gmail.com'   => ['PAI'],          // Fajar Nugroho (1 mapel)
+            'gina@gmail.com'    => ['PJOK'],         // Gina Maharani (1 mapel)
+            'hendra@gmail.com'  => ['SBD'],          // Hendra Wijaya (1 mapel)
+            'intan@gmail.com'   => ['BK', 'IPAS'],   // Intan Permata (2 mapel)
+            'joko@gmail.com'    => ['PPL', 'PWEB'],  // Joko Susilo (2 mapel - RPL)
+            'kartika@gmail.com' => ['PBO', 'BD'],    // Kartika Dewi (2 mapel - RPL)
+            'lukman@gmail.com'  => ['UIUX'],         // Lukman Hakim (1 mapel - RPL)
+            'maria@gmail.com'   => ['DJK', 'AJJ'],   // Maria Fitri (2 mapel - TKJ)
+            'nadia@gmail.com'   => ['KJS', 'SRV'],   // Nadia Putri (2 mapel - TKJ)
+            'oki@gmail.com'     => ['LJK'],          // Oki Pratama (1 mapel - TKJ)
+            'putri@gmail.com'   => ['AKD', 'KOM'],   // Putri Rahayu (2 mapel - AKL)
+            'qori@gmail.com'    => ['AKP', 'AKDAG'], // Qori Anggraini (2 mapel - AKL)
+            'rian@gmail.com'    => ['PAJAK'],        // Rian Hidayat (1 mapel - AKL)
+            'siti@gmail.com'    => ['DKV', 'GRAF'],  // Siti Aminah (2 mapel - DKV)
+            'taufik@gmail.com'  => ['FOTO', 'VID'],  // Taufik Ismail (2 mapel - DKV)
+            'utami@gmail.com'   => ['ANIM'],         // Utami Dewi (1 mapel - DKV)
+            'wahyu@gmail.com'   => ['MTK'],          // Wahyu Setiawan (1 mapel)
+            'yuni@gmail.com'    => ['BIG'],          // Yuni Astuti (1 mapel)
+            'zainal@gmail.com'  => ['BIN'],          // Zainal Abidin (1 mapel)
+        ];
+
+        $mapelToGuru = [];
+        foreach ($guruMapelMap as $email => $kodes) {
+            foreach ($kodes as $kode) {
+                if (isset($guruByEmail[$email])) {
+                    $mapelToGuru[$kode][] = $guruByEmail[$email];
+                }
+            }
         }
 
         $kelasList = [];
@@ -252,81 +300,120 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        KegiatanSekolah::query()
-            ->where('tahun_ajaran_id', $tahunAjaran->id)
-            ->where('hari', 'Senin')
-            ->where('nama_kegiatan', 'Upacara Bendera Rutin')
-            ->delete();
-
         $hariSekolah = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-        $kelasLama = [
-            ['guru' => $guruList[0], 'kelas' => 'X RPL 1', 'mapel' => 'MTK'],
-            ['guru' => $guruList[0], 'kelas' => 'XI RPL 1', 'mapel' => 'PWEB'],
-            ['guru' => $guruList[1], 'kelas' => 'X RPL 2', 'mapel' => 'BIN'],
-        ];
-        foreach ($kelasLama as $jadwalLama) {
-            JadwalPelajaran::query()
-                ->where('tahun_ajaran_id', $tahunAjaran->id)
-                ->where('guru_id', $jadwalLama['guru']->id)
-                ->where('kelas_id', Kelas::where('nama_kelas', $jadwalLama['kelas'])->value('id'))
-                ->where('mata_pelajaran_id', $mapelList[$jadwalLama['mapel']]->id)
-                ->whereNotIn('hari', $hariSekolah)
-                ->delete();
+
+        // Bersihkan data jadwal lama untuk tahun ajaran aktif
+        DB::table('jadwal_pelajaran_sesi')->where('tahun_ajaran_id', $tahunAjaran->id)->delete();
+        JadwalPelajaran::where('tahun_ajaran_id', $tahunAjaran->id)->delete();
+
+        // Generate Jadwal Pelajaran (Bebas bentrok dan setiap guru hanya mengajar mapel yang diampunya)
+        $busyTeachers = [];
+        $teacherHours = [];
+        foreach ($guruList as $g) {
+            $teacherHours[$g->id] = 0;
         }
 
-        $guruCount = count($guruList);
-        foreach ($kelasList as $kelasIndex => $kelasData) {
-            $mapelJurusan = array_map(
-                fn (array $mapel) => $mapelList[$mapel[0]],
-                $jurusanMapel[$kelasData['jurusan']]
-            );
-            $mapelKelas = array_merge(array_values($mapelUmumList), $mapelJurusan);
+        $mapelUmumKodes = array_column($mapelUmum, 0);
 
-            foreach ($hariSekolah as $hariIndex => $hari) {
+        foreach ($kelasList as $kelasIndex => $kelasData) {
+            $jurusanKodes = array_column($jurusanMapel[$kelasData['jurusan']], 0);
+
+            // Susun kurikulum mingguan 40 sesi (Senin-Kamis 9 sesi, Jumat 4 sesi)
+            $curriculum = [];
+            foreach ($jurusanKodes as $jk) {
+                for ($i = 0; $i < 3; $i++) {
+                    $curriculum[] = $jk;
+                }
+            }
+            foreach ($mapelUmumKodes as $uk) {
+                $curriculum[] = $uk;
+                $curriculum[] = $uk;
+            }
+            $curriculum[] = $jurusanKodes[0];
+            $curriculum[] = $jurusanKodes[1];
+            $curriculum[] = 'MTK';
+
+            // Rotasi agar antar-kelas tidak menuntut mapel yang sama persis di jam yang sama
+            $shift = ($kelasIndex * 7) % count($curriculum);
+            $curriculum = array_merge(array_slice($curriculum, $shift), array_slice($curriculum, 0, $shift));
+
+            $currIndex = 0;
+            foreach ($hariSekolah as $hari) {
                 $jumlahSesi = $hari === 'Jumat' ? 4 : 9;
                 for ($sesiIndex = 0; $sesiIndex < $jumlahSesi; $sesiIndex++) {
                     $jam = $jamList['Sesi '.($sesiIndex + 1)];
-                    $guru = $guruList[($kelasIndex + $sesiIndex + $hariIndex) % $guruCount];
-                    $mapel = $mapelKelas[($kelasIndex + $sesiIndex + $hariIndex) % count($mapelKelas)];
+                    $assignedMapelKode = null;
+                    $selectedGuru = null;
 
-                    JadwalPelajaran::updateOrCreate(
-                        [
+                    $attempts = 0;
+                    $maxAttempts = count($curriculum);
+
+                    while ($attempts < $maxAttempts && !empty($curriculum)) {
+                        $candidateKode = $curriculum[$currIndex % count($curriculum)];
+                        $candidates = $mapelToGuru[$candidateKode] ?? [];
+
+                        // Utamakan guru dengan jam mengajar terendah agar beban merata
+                        usort($candidates, fn ($a, $b) => ($teacherHours[$a->id] ?? 0) <=> ($teacherHours[$b->id] ?? 0));
+
+                        foreach ($candidates as $candidateGuru) {
+                            if (empty($busyTeachers[$hari][$sesiIndex][$candidateGuru->id])) {
+                                $selectedGuru = $candidateGuru;
+                                $assignedMapelKode = $candidateKode;
+                                break;
+                            }
+                        }
+
+                        if ($selectedGuru !== null) {
+                            array_splice($curriculum, $currIndex % count($curriculum), 1);
+                            break;
+                        }
+
+                        $currIndex++;
+                        $attempts++;
+                    }
+
+                    // Fallback jika slot dari antrean kurikulum sedang bentrok
+                    if ($selectedGuru === null) {
+                        $fallbackKodes = array_merge($jurusanKodes, $mapelUmumKodes);
+                        shuffle($fallbackKodes);
+                        foreach ($fallbackKodes as $fbKode) {
+                            $candidates = $mapelToGuru[$fbKode] ?? [];
+                            foreach ($candidates as $candidateGuru) {
+                                if (empty($busyTeachers[$hari][$sesiIndex][$candidateGuru->id])) {
+                                    $selectedGuru = $candidateGuru;
+                                    $assignedMapelKode = $fbKode;
+                                    break 2;
+                                }
+                            }
+                        }
+                    }
+
+                    if ($selectedGuru !== null && $assignedMapelKode !== null) {
+                        $busyTeachers[$hari][$sesiIndex][$selectedGuru->id] = true;
+                        $teacherHours[$selectedGuru->id] = ($teacherHours[$selectedGuru->id] ?? 0) + 1;
+
+                        $jadwal = JadwalPelajaran::create([
                             'tahun_ajaran_id' => $tahunAjaran->id,
                             'kelas_id' => $kelasData['model']->id,
+                            'guru_id' => $selectedGuru->id,
+                            'mata_pelajaran_id' => $mapelList[$assignedMapelKode]->id,
                             'hari' => $hari,
                             'jam_pelajaran_mulai_id' => $jam->id,
-                        ],
-                        [
-                            'guru_id' => $guru->id,
-                            'mata_pelajaran_id' => $mapel->id,
                             'jam_pelajaran_selesai_id' => $jam->id,
-                        ]
-                    );
+                        ]);
+
+                        DB::table('jadwal_pelajaran_sesi')->insert([
+                            'jadwal_pelajaran_id' => $jadwal->id,
+                            'jam_pelajaran_id' => $jam->id,
+                            'tahun_ajaran_id' => $tahunAjaran->id,
+                            'guru_id' => $selectedGuru->id,
+                            'kelas_id' => $kelasData['model']->id,
+                            'hari' => $hari,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
                 }
-            }
-        }
-
-        foreach (JadwalPelajaran::with(['jamMulai', 'jamSelesai'])
-            ->where('tahun_ajaran_id', $tahunAjaran->id)
-            ->get() as $jadwal) {
-            $sesiIds = JamPelajaran::where('jenis', 'pelajaran')
-                ->where('jam_mulai', '>=', $jadwal->jamMulai->jam_mulai)
-                ->where('jam_selesai', '<=', $jadwal->jamSelesai->jam_selesai)
-                ->orderBy('urutan')
-                ->pluck('id');
-
-            foreach ($sesiIds as $sesiId) {
-                DB::table('jadwal_pelajaran_sesi')->updateOrInsert(
-                    ['jadwal_pelajaran_id' => $jadwal->id, 'jam_pelajaran_id' => $sesiId],
-                    [
-                        'tahun_ajaran_id' => $jadwal->tahun_ajaran_id,
-                        'guru_id' => $jadwal->guru_id,
-                        'kelas_id' => $jadwal->kelas_id,
-                        'hari' => $jadwal->hari,
-                        'updated_at' => now(),
-                        'created_at' => now(),
-                    ]
-                );
             }
         }
     }

@@ -14,11 +14,11 @@
     <form action="{{ route('guru.riwayat') }}" method="GET" class="row g-2">
         <div class="col-6">
             <label class="form-label small mb-1">Tanggal</label>
-            <input type="date" name="tanggal" class="form-control form-control-sm" value="{{ request('tanggal') }}" style="border-radius: 8px;">
+            <input type="date" name="tanggal" class="form-control form-control-sm" value="{{ request('tanggal') }}" >
         </div>
         <div class="col-6">
             <label class="form-label small mb-1">Status</label>
-            <select name="status" class="form-select form-select-sm" style="border-radius: 8px;">
+            <select name="status" class="form-select form-select-sm" >
                 <option value="">Semua</option>
                 <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Tepat Waktu</option>
                 <option value="terlambat" {{ request('status') == 'terlambat' ? 'selected' : '' }}>Terlambat</option>
@@ -27,11 +27,11 @@
             </select>
         </div>
         <div class="col-12 d-flex gap-2 mt-2">
-            <button type="submit" class="btn btn-sm btn-primary w-100" style="border-radius: 8px;">
+            <button type="submit" class="btn btn-sm btn-primary w-100" >
                 <i class="bi bi-funnel me-1"></i>Filter
             </button>
             @if(request('tanggal') || request('status'))
-                <a href="{{ route('guru.riwayat') }}" class="btn btn-sm btn-outline-secondary" style="border-radius: 8px;">Reset</a>
+                <a href="{{ route('guru.riwayat') }}" class="btn btn-sm btn-outline-secondary" >Reset</a>
             @endif
         </div>
     </form>
@@ -42,7 +42,7 @@
     @forelse ($riwayat as $item)
         <div class="card-mobile p-3 mb-2">
             <div class="d-flex justify-content-between align-items-start mb-2">
-                <span class="badge bg-indigo-lt fw-bold px-2 py-1" style="border-radius: 8px;">
+                <span class="badge bg-indigo-lt fw-bold px-2 py-1" >
                     <i class="bi bi-door-open me-1"></i>{{ $item->jadwalPelajaran->kelas->nama_kelas ?? '-' }}
                 </span>
                 <div>
@@ -60,7 +60,7 @@
 
             <div class="fw-bold fs-5 text-dark mb-1">{{ $item->jadwalPelajaran->mataPelajaran->nama ?? '-' }}</div>
 
-            <div class="d-flex justify-content-between align-items-center text-secondary small mb-2" style="font-size: 0.78rem;">
+            <div class="d-flex justify-content-between align-items-center text-secondary small mb-2" style="font-size: var(--text-xs);">
                 <span><i class="bi bi-calendar3 me-1"></i>{{ $item->tanggal->translatedFormat('d M Y') }}</span>
                 <span><i class="bi bi-clock me-1"></i>{{ substr($item->waktu_absen, 0, 5) }} WIB</span>
                 @if($item->jarak_meter !== null)
@@ -69,11 +69,11 @@
             </div>
 
             @if($item->materi_diajarkan)
-                <div class="p-2 bg-body-tertiary rounded-3 small border mt-2">
-                    <div class="text-secondary fw-semibold" style="font-size: 0.7rem;">Materi:</div>
+                <div class="well p-2 small mt-2">
+                    <div class="text-secondary fw-semibold" style="font-size: var(--text-xs);">Materi:</div>
                     <div class="text-dark">{{ $item->materi_diajarkan }}</div>
                     @if($item->catatan_siswa_tidak_masuk)
-                        <div class="text-muted mt-1" style="font-size: 0.72rem;">
+                        <div class="text-muted mt-1" style="font-size: var(--text-xs);">
                             <em>Catatan siswa: {{ $item->catatan_siswa_tidak_masuk }}</em>
                         </div>
                     @endif

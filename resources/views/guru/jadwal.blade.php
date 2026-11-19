@@ -8,7 +8,7 @@
         <div class="fw-bold fs-3 text-dark">Jadwal Mingguan</div>
     </div>
     @if($tahunAktif)
-        <span class="badge bg-primary-lt px-2 py-1" style="font-size: 0.72rem;">{{ $tahunAktif->nama }}</span>
+        <span class="badge bg-primary-lt px-2 py-1" style="font-size: var(--text-xs);">{{ $tahunAktif->nama }}</span>
     @endif
 </div>
 
@@ -53,9 +53,9 @@
             onclick="switchDayTab(this, 'day-section-{{ $h }}')">
             {{ $h }}
             @if($isToday)
-                <span class="badge bg-white text-primary ms-1" style="font-size: 0.65rem;">Hari Ini</span>
+                <span class="badge bg-white text-primary ms-1" style="font-size: var(--text-2xs);">Hari Ini</span>
             @elseif($countAgenda > 0)
-                <span class="badge bg-secondary-lt ms-1" style="font-size: 0.65rem;">{{ $countAgenda }}</span>
+                <span class="badge bg-secondary-lt ms-1" style="font-size: var(--text-2xs);">{{ $countAgenda }}</span>
             @endif
         </button>
     @endforeach
@@ -92,10 +92,10 @@
                 @php $item = $agenda['data']; @endphp
                 <div class="card-mobile p-3 mb-2">
                     <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
-                        <span class="badge bg-indigo-lt fw-bold px-2 py-1" style="border-radius: 8px;">
+                        <span class="badge bg-indigo-lt fw-bold px-2 py-1" >
                             <i class="bi bi-door-open me-1"></i>{{ $item->kelas->nama_kelas }}
                         </span>
-                        <span class="badge bg-secondary-lt font-monospace text-nowrap" style="font-size: 0.75rem;">
+                        <span class="badge bg-secondary-lt font-monospace text-nowrap" style="font-size: var(--text-xs);">
                             <i class="bi bi-clock me-1"></i>{{ substr($agenda['jam_mulai'], 0, 5) }} - {{ substr($agenda['jam_selesai'], 0, 5) }}
                         </span>
                     </div>
